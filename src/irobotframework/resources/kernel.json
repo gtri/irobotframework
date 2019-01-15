@@ -1,0 +1,13 @@
+{
+    "argv": [
+        "python", "-m", "irobotframework.kernel", "-f", "{connection_file}"
+    ],
+    "codemirror_mode": {
+      "name": "Robot Framework"
+    },
+    "display_name": "Robot Framework",
+    "language": "robotframework",
+    "mimetype": "text/x-robotframework",
+    "name": "robotframework",
+    "pygments_lexer": "robotframework"
+}

@@ -1,0 +1,55 @@
+@import url("ocr-a.css");
+@import url("variables.css");
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "OCR-A";
+  text-transform: uppercase;
+}
+
+a, a:hover, a:active {
+  color: var(--rf-color-blue);
+}
+
+
+a:hover, a:active {
+  text-decoration: underline;
+  background-color: transparent;
+}
+
+.wy-nav-content {
+  max-width: unset;
+}
+
+.wy-nav-side,
+.wy-side-nav-search {
+  background-color: black;
+}
+
+.wy-body-for-nav .wy-menu-vertical li.current > a {
+  background-color: var(--rf-color-blue);
+  color: white;
+}
+
+.wy-menu-vertical li.current>a:hover {
+  background-color: var(--rf-color-blue);
+  color: black;
+}
+
+.admonition.warning {
+  display: none;
+}
+
+#rtd-search-form input {
+  border-radius: 0;
+  border: 0;
+  clip-path: polygon(
+    0% var(--rf-notch-size),
+    var(--rf-notch-size) 0%,
+    calc(100% - var(--rf-notch-size)) 0%,
+    100% var(--rf-notch-size),
+    100% calc(100% - var(--rf-notch-size)),
+    calc(100% - var(--rf-notch-size)) 100%,
+    var(--rf-notch-size) 100%,
+    0% calc(100% - var(--rf-notch-size))
+  );
+}

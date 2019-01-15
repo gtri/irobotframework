@@ -1,0 +1,148 @@
+name: irobotframework-dev
+
+variables:
+  NEXT_RELEASE: 0.5.0
+
+commands:
+  atom:
+    unix: atom .
+    env_spec: test
+  bootstrap:
+    unix: |-
+      set -eux \
+      && pip install -e . --ignore-installed --no-deps --no-cache-dir \
+      && jupyter kernelspec install \
+        --name robotframework \
+        --sys-prefix \
+        src/irobotframework/resources \
+      && jupyter kernelspec list \
+      && jlpm bootstrap
+    env_spec: default
+  build:docs:
+    description: build the docs
+    unix: sphinx-build docs dist/docs
+    env_spec: docs
+  build:docs:watch:
+    description: build the docs
+    unix: sphinx-autobuild -b html docs dist/docs
+    env_spec: docs
+  build:pip:sdist:
+    description: build a pip sdist
+    unix: |-
+      set -eux \
+      && python setup.py clean \
+      && python setup.py sdist --dist-dir ${PROJECT_DIR}/dist/pip
+    env_spec: test
+  build:pip:wheel:
+    description: build a pip wheel
+    unix: |-
+      set -eux \
+      && python setup.py clean \
+      && python setup.py bdist_wheel --dist-dir ${PROJECT_DIR}/dist/pip
+    env_spec: test
+  build:npm:
+    description: build an npm package
+    unix: |-
+      set -eux \
+      && mkdir -p dist/npm \
+      && cd src/packages/jupyterlab-robotframework \
+      && mv $(npm pack) ../../../dist/npm/
+    env_spec: test
+  jlpm:
+    description: run the yarn bundled with JupyterLab
+    unix: jlpm
+    env_spec: default
+  lab:
+    description: run JupyterLab
+    unix: jupyter lab --no-browser --debug
+    env_spec: default
+  lab:build:
+    description: rebuild JupyterLab
+    unix: jupyter lab build --dev
+    env_spec: default
+  ipython:
+    unix: ipython --kernel-name robotframework
+    env_spec: default
+  test:py:
+    unix: mkdir -p _testoutput && cd _testoutput && pytest
+    env_spec: test
+  test:robot:
+    unix: set -eux \
+      && cd atest/acceptance \
+      && python -m robot -d ../../_testoutput --xunit junit_robot.xml .
+    env_spec: test
+  test:release:
+    unix: python -m scripts.release_check ${NEXT_RELEASE}
+    env_spec: test
+  test:lint:
+    unix: |-
+      set -eux \
+      && python -m scripts.nblint \
+      && python -m scripts.copyright \
+      && python -m robot.tidy -r atest \
+      && rflint \
+        --configure TooManyTestSteps:20 \
+        --configure TooFewKeywordSteps:0 \
+        --configure LineTooLong:200 \
+        atest/**/*.robot \
+      && black --line-length 88 setup.py ./src/irobotframework/ scripts docs \
+      && flake8 --max-line-length=88 \
+      && jlpm lint
+    env_spec: test
+  release:pypi:
+    unix: |-
+      set -eux \
+      && twine upload dist/sdist/* \
+      && twine upload dist/sdist/*
+    env_spec: test
+
+env_specs:
+  _python:
+    packages:
+      - python >=3.6,<3.7
+  _build:
+    description: an environment for building conda packages (busted in CI, use base)
+    inherit_from:
+      - _python
+    packages:
+      - conda-build
+      - conda-verify
+  default:
+    description: a pretty heavy environment, because robot & jupyter & node
+    inherit_from:
+      - _python
+    channels:
+      - conda-forge
+      - defaults
+    packages:
+      - importnb >=0.5.2
+      - ipykernel >=5.1
+      - ipython >=7.2
+      - jupyterlab >=0.35.4,<0.36
+      - nodejs >=8.12,<9
+      - pillow
+      - robotframework >=3.1
+  test:
+    description: an even-heavier test environment, because browsers
+    inherit_from:
+      - default
+    packages:
+      - black
+      - flake8
+      - geckodriver
+      - jupyter_kernel_test
+      - pylint
+      - pytest
+      - pytest-cov
+      - python-chromedriver-binary
+      - robotframework-lint
+      - robotframework-seleniumlibrary >=3.2.0
+      - twine
+  docs:
+    inherit_from:
+      - default
+    packages:
+      - nbsphinx
+      - sphinx
+      - sphinx_rtd_theme
+      - sphinx-autobuild

@@ -1,0 +1,17 @@
+__pycache__/
+_notebooks
+_testoutput
+.*_cache/
+.idea/
+.ipynb_checkpoints/
+.jupyter/
+*.egg-info/
+*.html
+*.log
+*.pyc
+build/
+dist/
+envs/
+lib/
+node_modules/
+Untitled*.ipynb

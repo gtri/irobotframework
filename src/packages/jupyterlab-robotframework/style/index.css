@@ -1,0 +1,60 @@
+/*
+  Copyright (c) 2018 Georgia Tech Research Corporation
+  Distributed under the terms of the BSD-3-Clause License
+*/
+
+.jp-Robot-Docs {
+  padding: var(--jp-notebook-padding);
+}
+
+.jp-RenderedHTMLCommon .jp-Robot-Docs table {
+  margin-left: 0;
+  margin-right: unset;
+}
+
+.jp-RenderedHTMLCommon .jp-Robot-Docs table td,
+.jp-RenderedHTMLCommon .jp-Robot-Docs table th {
+  text-align: left;
+}
+
+.jp-Robot-Docs-header {
+  float: right;
+}
+
+.jp-RenderedHTMLCommon .jp-Robot-Docs-html table,
+.jp-RenderedHTMLCommon .jp-Robot-Docs-html pre {
+  font-family: var(--jp-code-font-family);
+  line-height: var(--jp-code-line-height);
+  margin-left: 2em;
+}
+
+.jp-RenderedHTMLCommon .jp-Robot-Docs-html table td {
+  border-right: var(--jp-border-width) solid var(--jp-border-color0);
+}
+
+.jp-RenderedHTMLCommon .jp-Robot-Docs-html table td:last-child {
+  border: 0;
+}
+
+.jp-RenderedHTMLCommon .jp-Robot-Docs blockquote {
+  border: 0;
+}
+
+.jp-RenderedHTMLCommon .jp-Robot-Docs-spec em {
+  color: var(--jp-content-font-color2);
+}
+
+.jp-RenderedHTMLCommon .jp-Robot-Docs-spec code {
+  font-size: 80%;
+}
+
+.jp-Robot-Docs-shortcuts {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.jp-Robot-Docs-shortcuts a {
+  flex: 1;
+  padding-right: 0.5em;
+}
