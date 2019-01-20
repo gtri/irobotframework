@@ -105,9 +105,9 @@ const VAR_NUM = /0(b[01]+|o[0-7]+|x[0-9a-f]+)|(\d+)(\.\d+)?(e-?(\d+)(\.\d+)?)?/i
 const VAR_BUILTIN = /(none|(cur|temp|exec)dir|\/|:|\\n|true|empty|false|null|space|test (name|documentation|status|message|tags)|prev test (name|status|message)|suite (name|source|documentation|status|message|metadata)|keyword (status|message)|(report|debug) file|log (file|level)|output (dir|file))(?=[.}]|\s+[*\-+\\%&|=><!])/i;
 
 /** a rule for the beginning of the variable state */
-const RULE_VAR_START = r(VAR_START, 'variable', { push: 'variable' });
+const RULE_VAR_START = r(VAR_START, 'variable-2', { push: 'variable' });
 /** a rule for the end of the variable state */
-const RULE_VAR_END = r(VAR_END, 'variable');
+const RULE_VAR_END = r(VAR_END, 'variable-2');
 
 /** a rule for a number */
 const RULE_NUM = r(VAR_NUM, 'number');
@@ -120,40 +120,44 @@ const RULE_DOUBLE_STRING_START = r(/"/, 'string', { push: 'double_string' });
 /** a rule for capturing tags (and friends) in keyword/test/task definitions */
 const RULE_TAGS = r(
   /([| ]* *)(\[\s*)(tags)(\s*\])( *\|?)/i,
-  ['bracket', 'atom', 'atom', 'atom', 'bracket'],
+  ['bracket', 'builtin', 'builtin', 'builtin', 'bracket'],
   { sol: true, push: 'tags' }
 );
 
 /** rule for special case of applying tags at the suite level */
-const RULE_SUITE_TAGS = r(/(force tags|default tags)(  +)/i, ['atom', null], {
-  push: 'tags',
-  sol: true
-});
+const RULE_SUITE_TAGS = r(
+  /(force tags|default tags)(  +)/i,
+  ['builtin', null],
+  {
+    push: 'tags',
+    sol: true
+  }
+);
 /** rule for special case of applying tags at the suite level (with pipes) */
 const RULE_SUITE_TAGS_PIPE = r(
   /(\| +)(force tags|default tags)( *\|?)/i,
-  ['bracket', 'atom', 'bracket'],
+  ['bracket', 'builtin', 'bracket'],
   { sol: true, push: 'tags' }
 );
 
 /** rule for bracketed settings of keyword/test/task */
 const RULE_SETTING_KEYWORD = r(
   /([| ]* *)(\[\s*)(setup|teardown|template)(\s*\])( *\|?)/i,
-  ['bracket', 'atom', 'atom', 'atom', 'bracket'],
+  ['bracket', 'builtin', 'builtin', 'builtin', 'bracket'],
   { push: 'keyword_invocation', sol: true }
 );
 
 /** rule for bracketed settings of keyword/test/task that include a keyword */
 const RULE_SUITE_SETTING_KEYWORD = r(
   /(suite setup|suite teardown|test setup|test teardown|test template|task setup|task teardown|task template)(  +)/i,
-  ['atom', null],
+  ['builtin', null],
   { push: 'keyword_invocation', sol: true }
 );
 
 /** rule for bracketed settings of keyword/test/task that include a keyword (with pipes) */
 const RULE_SUITE_SETTING_KEYWORD_PIPE = r(
   /(\| +)(suite setup|suite teardown|test setup|test teardown|test template|task setup|task teardown|task template)( +\|)/i,
-  ['bracket', 'atom', 'bracket'],
+  ['bracket', 'builtin', 'bracket'],
   { push: 'keyword_invocation', sol: true }
 );
 
@@ -196,7 +200,7 @@ states.settings = [
   RULE_SUITE_SETTING_KEYWORD,
   r(
     /(\|* *)(library|resource|variables|documentation|metadata|test timeout|task timeout)( *)/i,
-    ['bracket', 'atom', null],
+    ['bracket', 'builtin', null],
     { sol: true }
   ),
   ...base
@@ -224,13 +228,31 @@ const RULE_KEY_START_PIPE = r(KEY_START_PIPE, ['bracket', null], {
   push: 'keyword_invocation',
   sol: true
 });
+/** rule for for old-style loops (slashes) */
+const RULE_START_LOOP_OLD = r(
+  /( \|* *)(:FOR)( \|* *)/,
+  [null, 'builtin', null],
+  {
+    push: 'loop_start_old',
+    sol: true
+  }
+);
+/** rule for for new-style loops (slashes) */
+const RULE_START_LOOP_NEW = r(
+  /( \|* *)(FOR)( \|* *)/,
+  [null, 'builtin', null],
+  {
+    push: 'loop_start_new',
+    sol: true
+  }
+);
 
 /** rules for capturing individual tags */
 states.tags = [
   r(/ \| */, 'bracket'),
   r(/^($|\n)/, null, { pop: true }),
   RULE_VAR_START,
-  r(/\}(?=$)/, 'variable', { pop: true }),
+  r(/\}(?=$)/, 'variable-2', { pop: true }),
   RULE_VAR_END,
   r(/^ *(?=$)/, null, { pop: true }),
   r(/ +/, null),
@@ -240,20 +262,73 @@ states.tags = [
   r(/[^\$&%@|]/, 'tag')
 ];
 
+/** need to catch empty white lines pretty explicitly */
+const RULE_WS_LINE = r(/ *(?=$)/, null, { sol: true });
+
+/** not a state. rules for starting keyword invocation */
+const RULES_KEYWORD_INVOKING = [
+  RULE_START_BDD,
+  RULE_KEY_START_PIPE,
+  RULE_KEY_START,
+  r(/\| (?=[^ ]*\|)/, null, { sol: true, push: 'keyword_invocation' }),
+  r(/(?=[^ ])/, null, { sol: true, push: 'keyword_invocation' })
+];
+
 /** rules for data rows inside a keyword definition */
 states.keywords = [
   RULE_TAGS,
   RULE_SETTING_KEYWORD,
   r(
     /([\| ]* *)(\[\s*)(arguments|documentation|return|timeout)(\s*\])( *\|?)/i,
-    ['bracket', 'atom', 'atom', 'atom', 'bracket'],
+    ['bracket', 'builtin', 'builtin', 'builtin', 'bracket'],
     { sol: true }
   ),
-  RULE_START_BDD,
-  RULE_KEY_START_PIPE,
-  RULE_KEY_START,
-  r(/\| (?=[^ ]*\|)/, null, { sol: true, push: 'keyword_invocation' }),
-  r(/(?=[^ ])/, null, { sol: true, push: 'keyword_invocation' }),
+  RULE_START_LOOP_OLD,
+  RULE_START_LOOP_NEW,
+  RULE_WS_LINE,
+  ...RULES_KEYWORD_INVOKING,
+  ...base
+];
+
+/** A range as used in for loops */
+const RULE_RANGE = r(/([\| ]* *)(IN)( RANGE)?/, [null, 'builtin', 'builtin']);
+
+states.loop_start_new = [
+  RULE_RANGE,
+  r(/[.]{3}/, 'builtin'),
+  RULE_VAR_START,
+  r(/\}(?=$)/, 'variable-2'),
+  RULE_VAR_END,
+  r(/([\| ]* *)(END)/, [null, 'builtin'], { sol: true, pop: true }),
+  RULE_WS_LINE,
+  ...RULES_KEYWORD_INVOKING,
+  ...base
+];
+
+states.loop_start_old = [
+  r(/(?=.*)/, null, { sol: true, next: 'loop_body_old' }),
+  RULE_RANGE,
+  RULE_VAR_START,
+  r(/\}(?=$)/, 'variable-2'),
+  RULE_VAR_END,
+  ...base
+];
+
+states.loop_body_old = [
+  ...RULES_KEYWORD_INVOKING.map(rule => {
+    return {
+      ...rule,
+      regex: new RegExp(
+        /([\| ]* *)(\\)/.source +
+          (rule.regex instanceof RegExp ? rule.regex.source : rule.regex)
+      ),
+      token:
+        rule.token instanceof Array
+          ? [null, 'builtin', ...rule.token]
+          : [null, 'builtin', rule.token]
+    };
+  }),
+  r(/(?= +[^\\])/, 'link', { pop: true, sol: true }),
   ...base
 ];
 
@@ -263,12 +338,11 @@ states.test_cases = [
   RULE_SETTING_KEYWORD,
   r(
     /([\| ]* *)(\[\s*)(documentation|timeout)(\s*\])/i,
-    ['bracket', 'atom', 'atom', 'atom'],
+    ['bracket', 'builtin', 'builtin', 'builtin'],
     { sol: true }
   ),
-  RULE_START_BDD,
-  RULE_KEY_START_PIPE,
-  RULE_KEY_START,
+  RULE_START_LOOP_OLD,
+  RULE_START_LOOP_NEW,
   r(
     /(\| +)([^ *\|\.][^\|]*?)( *)(\|?$)/,
     ['bracket', 'string.header', 'bracket'],
@@ -280,6 +354,8 @@ states.test_cases = [
     sol: true
   }),
   r(/([^| *].+$)/, 'string.header', { sol: true }),
+  RULE_WS_LINE,
+  ...RULES_KEYWORD_INVOKING,
   ...base
 ];
 
@@ -287,7 +363,7 @@ states.test_cases = [
 states.keyword_invocation = [
   r(/^(?= *$)/, null, { pop: true }),
   RULE_VAR_START,
-  r(/\}(?=$)/, 'variable', { pop: true }),
+  r(/\}(?=$)/, 'variable-2', { pop: true }),
   RULE_VAR_END,
   r(/#.*$/, 'comment', { pop: true }),
   r(/( \| |  +)/, 'bracket', { pop: true }),
@@ -311,9 +387,9 @@ states.variable = [
   r(VAR_OP, 'operator'),
   r(/\./, 'operator', { push: 'variable_property' }),
   r(/\[/, 'bracket', { next: 'variable_index' }),
-  r(/\}(?=\[)/, 'variable'),
-  r(/[^}\n$]/, 'variable'),
-  r(/^(?=\})/, 'variable', { pop: true })
+  r(/\}(?=\[)/, 'variable-2'),
+  r(/[^}\n$]/, 'variable-2'),
+  r(/^(?=\})/, 'variable-2', { pop: true })
 ];
 
 /** rules for extended syntax in a variable reference */
@@ -326,7 +402,7 @@ states.variable_property = [
   r(VAR_OP, 'operator'),
   r(/\(/, 'bracket'),
   r(/\)/, 'bracket', { pop: true }),
-  r(/([a-z_][a-z_\d]*)(=)/i, ['variable', 'operator']),
+  r(/([a-z_][a-z_\d]*)(=)/i, ['variable-2', 'operator']),
   r(/,/, 'punctuation'),
   r(/[^}](?=\})/, 'property', { pop: true }),
   r(/(^\})( *(?=$|\n))/, ['bracket', null], { pop: true }),
@@ -354,7 +430,7 @@ states.variable_index = [
   RULE_NUM,
   r(/\[/, 'bracket'),
   r(/\](?=\])/, 'bracket'),
-  r(/(\])(\})( ?=?)/, ['bracket', 'variable', 'operator'], { pop: true }),
+  r(/(\])(\})( ?=?)/, ['bracket', 'variable-2', 'operator'], { pop: true }),
   r(/(\])(\[)/, 'bracket'),
   r(/\]/, 'bracket', { pop: true }),
   r(/[^\]]/, 'string')
