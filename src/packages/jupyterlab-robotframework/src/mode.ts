@@ -291,7 +291,11 @@ states.keywords = [
 ];
 
 /** A range as used in for loops */
-const RULE_RANGE = r(/([\| ]* *)(IN)( RANGE)?/, [null, 'builtin', 'builtin']);
+const RULE_RANGE = r(/([\| ]* *)(IN)( RANGE| ENUMERATE| ZIP)?/, [
+  null,
+  'builtin',
+  'builtin'
+]);
 
 states.loop_start_new = [
   RULE_RANGE,
