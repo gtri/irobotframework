@@ -180,7 +180,6 @@ const base = [
   RULE_VAR_START,
   RULE_VAR_END,
   r(/\|/, 'bracket'),
-  r(/[\.]{3}/, 'bracket'),
   r(/#.*$/, 'comment'),
   r(/\\ +/, 'bracket'),
   r(/\\(?=$)/, 'bracket'),
@@ -226,6 +225,8 @@ states.library = [
   ...base
 ];
 
+const RULE_ELLIPSIS = r(/(\s*)(\.\.\.)/, [null, 'bracket']);
+
 /** rule for behavior-driven-development keywords */
 const RULE_START_BDD = r(
   /(\|\s*\|\s*|\s\s+)?(given|when|then|and|but)/i,
@@ -236,7 +237,7 @@ const RULE_START_BDD = r(
   }
 );
 /** rule for whitespace keywords */
-const RULE_KEY_START = r(/(\t+|  +)/, 'null', {
+const RULE_KEY_START = r(/(\t+|  +)(?!\.\.\.)/, null, {
   push: 'keyword_invocation',
   sol: true
 });
@@ -293,11 +294,12 @@ const RULES_KEYWORD_INVOKING = [
 
 /** rules for data rows inside a keyword table */
 states.keywords = [
+  RULE_ELLIPSIS,
   RULE_TAGS,
   RULE_SETTING_KEYWORD,
   r(
     /([\|\s]*\s*)(\[\s*)(arguments|documentation|return|timeout)(\s*\])(\s*\|?)/i,
-    ['bracket', 'builtin', 'builtin', 'builtin', 'bracket'],
+    ['bracket', 'meta', 'meta', 'meta', 'bracket'],
     { sol: true }
   ),
   r(/(?=[^\s$&%@*|]+)/, null, { sol: true, push: 'keyword_def' }),
@@ -335,7 +337,7 @@ const RULE_RANGE = r(/([\|\s]*\s*)(IN)( RANGE| ENUMERATE| ZIP)?/, [
 
 states.loop_start_new = [
   RULE_RANGE,
-  r(/[.]{3}/, 'builtin'),
+  r(/[.]{3}/, 'bracket'),
   RULE_VAR_START,
   r(/\}(?=$)/, 'variable-2'),
   RULE_VAR_END,
@@ -364,8 +366,8 @@ states.loop_body_old = [
       ),
       token:
         rule.token instanceof Array
-          ? [null, 'builtin', ...rule.token]
-          : [null, 'builtin', rule.token]
+          ? [null, 'bracket', ...rule.token]
+          : [null, 'bracket', rule.token]
     };
   }),
   r(/(?=\s+[^\\])/, null, { pop: true, sol: true }),
@@ -374,11 +376,12 @@ states.loop_body_old = [
 
 /** rules for data rows inside test/task definition */
 states.test_cases = [
+  RULE_ELLIPSIS,
   RULE_TAGS,
   RULE_SETTING_KEYWORD,
   r(
     /([\|\s]*\s*)(\[\s*)(documentation|timeout)(\s*\])/i,
-    ['bracket', 'builtin', 'builtin', 'builtin'],
+    ['bracket', 'meta', 'meta', 'meta'],
     { sol: true }
   ),
   RULE_START_LOOP_OLD,
@@ -402,13 +405,13 @@ states.test_cases = [
 /** rules for inside of an invoked keyword instance */
 states.keyword_invocation = [
   r(/(?=\s*$)/, null, { pop: true }),
+  r(/(\\|\.\.\.) +/, 'bracket', { pop: true }),
   RULE_VAR_START,
   RULE_LINE_ENDS_WITH_VAR,
   RULE_VAR_END,
   r(/#.*$/, 'comment', { pop: true }),
   r(/( \| |  +)/, 'bracket', { pop: true }),
   r(/ ?=(  +)/, 'operator'),
-  r(/(\\|[\.]{3}) +/, 'bracket', { pop: true }),
   r(/ /, null),
   r(KEYWORD_WORD_BEFORE_VAR, 'keyword'),
   r(KEYWORD_WORD_BEFORE_SEP, 'keyword', { pop: true }),
