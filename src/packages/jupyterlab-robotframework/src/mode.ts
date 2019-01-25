@@ -125,10 +125,14 @@ const RULE_TAGS = r(
 );
 
 /** rule for special case of applying tags at the suite level */
-const RULE_SUITE_TAGS = r(/(force tags|default tags)(  +)/i, ['meta', null], {
-  push: 'tags',
-  sol: true
-});
+const RULE_SUITE_TAGS = r(
+  /(force tags|default tags)(\t+|  +)/i,
+  ['meta', null],
+  {
+    push: 'tags',
+    sol: true
+  }
+);
 /** rule for special case of applying tags at the suite level (with pipes) */
 const RULE_SUITE_TAGS_PIPE = r(
   /(\| +)(force tags|default tags)( *\|?)/i,
@@ -145,7 +149,7 @@ const RULE_SETTING_KEYWORD = r(
 
 /** rule for bracketed settings of keyword/test/task that include a keyword */
 const RULE_SUITE_SETTING_KEYWORD = r(
-  /(suite setup|suite teardown|test setup|test teardown|test template|task setup|task teardown|task template)(\t|  +)/i,
+  /(suite setup|suite teardown|test setup|test teardown|test template|task setup|task teardown|task template)(\t+|  +)/i,
   ['meta', null],
   { push: 'keyword_invocation', sol: true }
 );
@@ -157,7 +161,7 @@ const RULE_SUITE_SETTING_KEYWORD_PIPE = r(
   { push: 'keyword_invocation', sol: true }
 );
 
-const RULE_SETTING_LIBRARY = r(/(library)(\t|  +)/i, ['meta', null], {
+const RULE_SETTING_LIBRARY = r(/(library)(\t+|  +)/i, ['meta', null], {
   push: 'library',
   sol: true
 });
@@ -411,7 +415,7 @@ states.keyword_invocation = [
   RULE_VAR_END,
   r(/#.*$/, 'comment', { pop: true }),
   r(/( \| |  +)/, 'bracket', { pop: true }),
-  r(/ ?=(  +)/, 'operator'),
+  r(/( ?)(=)(\t+|  +)/, [null, 'operator', null]),
   r(/ /, null),
   r(KEYWORD_WORD_BEFORE_VAR, 'keyword'),
   r(KEYWORD_WORD_BEFORE_SEP, 'keyword', { pop: true }),
