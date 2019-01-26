@@ -21,6 +21,49 @@ import 'codemirror/addon/mode/simple';
 
 import * as CodeMirror from 'codemirror';
 
+/** All the possible states: pushing non-existing states == bad */
+export type TMainState = 'test_cases' | 'keywords' | 'settings' | 'variables';
+export type TState =
+  | TMainState
+  | 'double_string'
+  | 'keyword_def'
+  | 'keyword_invocation'
+  | 'library'
+  | 'loop_body_old'
+  | 'loop_start_new'
+  | 'loop_start_old'
+  | 'single_string'
+  | 'start'
+  | 'tags'
+  | 'variable_index'
+  | 'variable_property'
+  | 'variable';
+
+/** the tokens we use */
+export enum TT {
+  V2 = 'variable-2',
+  BK = 'bracket',
+  NB = 'number',
+  ST = 'string',
+  MT = 'meta',
+  CM = 'comment',
+  AT = 'attribute',
+  AM = 'atom',
+  OP = 'operator',
+  SSE = 'string.strong.em',
+  SS = 'string.strong',
+  SE = 'string.em',
+  SH = 'string.header',
+  KW = 'keyword',
+  BE = 'builtin.em',
+  TG = 'tag',
+  DF = 'def',
+  HL = 'header.link',
+  PR = 'property',
+  PC = 'punctuation',
+  BI = 'builtin'
+}
+
 /**
   An implementation of the CodeMirror simple mode object
 
@@ -30,13 +73,13 @@ interface ISimpleState {
   /** The regular expression that matches the token. May be a string or a regex object. When a regex, the ignoreCase flag will be taken into account when matching the token. This regex has to capture groups when the token property is an array. If it captures groups, it must capture all of the string (since JS provides no way to find out where a group matched). */
   regex: string | RegExp;
   /// An optional token style. Multiple styles can be specified by separating them with dots or spaces. When this property holds an array of token styles, the regex for this rule must capture a group for each array item.
-  token?: string | string[] | null;
+  token?: TT | TT[] | null;
   /// When true, this token will only match at the start of the line. (The ^ regexp marker doesn't work as you'd expect in this context because of limitations in JavaScript's RegExp API.)
   sol?: boolean;
   /// When a next property is present, the mode will transfer to the state named by the property when the token is encountered.
-  next?: string;
+  next?: TState;
   /// Like next, but instead replacing the current state by the new state, the current state is kept on a stack, and can be returned to with the pop directive.
-  push?: string;
+  push?: TState;
   /// When true, and there is another state on the state stack, will cause the mode to pop that state off the stack and transition to it.
   pop?: boolean;
   /// Can be used to embed another mode inside a mode. When present, must hold an object with a spec property that describes the embedded mode, and an optional end end property that specifies the regexp that will end the extent of the mode. When a persistent property is set (and true), the nested mode's state will be preserved between occurrences of the mode.
@@ -54,21 +97,19 @@ interface ISimpleState {
 }
 
 /** A string-keyed set of simple state lists */
-export interface IStates {
-  [key: string]: ISimpleState[];
-}
+export type IStates = { [key in TState]: ISimpleState[] };
 
 /** helper function for compactly representing a rule */
 function r(
   regex: RegExp,
-  token?: string | string[],
+  token?: TT | TT[],
   opt?: Partial<ISimpleState>
 ): ISimpleState {
   return { regex, token, ...opt };
 }
 
 /** Possible Robot Framework table names. Group count is important.  */
-const TABLE_NAMES: { [key: string]: RegExp } = {
+const TABLE_NAMES: { [key in TMainState]: RegExp } = {
   keywords: /(\|\s)?(\*+ *)(user keywords?|keywords?)( *\**)/i,
   settings: /(\|\s)?(\*+ *)(settings?)( *\**)/i,
   test_cases: /(\|\s)?(\*+ *)(tasks?|test cases?)( *\**)/i,
@@ -76,18 +117,12 @@ const TABLE_NAMES: { [key: string]: RegExp } = {
 };
 
 /** Enumerate the possible rules  */
-const RULES_TABLE: ISimpleState[] = Object.keys(TABLE_NAMES).map(
-  (next: string) => {
-    return r(
-      TABLE_NAMES[next],
-      ['bracket', 'header.link', 'header.link', 'header.link'],
-      {
-        next,
-        sol: true
-      }
-    );
-  }
-);
+const RULES_TABLE = Object.keys(TABLE_NAMES).map((next: TMainState) => {
+  return r(TABLE_NAMES[next], [TT.BK, TT.HL, TT.HL, TT.HL], {
+    next,
+    sol: true
+  });
+});
 
 /** Valid python operators */
 const VAR_OP = /[*\-+\\%&|=><!]/;
@@ -100,29 +135,29 @@ const VAR_NUM = /0(b[01]+|o[0-7]+|x[0-9a-f]+)|(\d+)(\.\d+)?(e-?(\d+)(\.\d+)?)?/i
 const VAR_BUILTIN = /(none|(cur|temp|exec)dir|\/|:|\\n|true|empty|false|null|space|test (name|documentation|status|message|tags)|prev test (name|status|message)|suite (name|source|documentation|status|message|metadata)|keyword (status|message)|(report|debug) file|log (file|level)|output (dir|file))(?=[.}]|\s+[*\-+\\%&|=><!])/i;
 
 /** a rule for the beginning of the variable state */
-const RULE_VAR_START = r(/[\$&@%]\{/, 'variable-2', { push: 'variable' });
+const RULE_VAR_START = r(/[\$&@%]\{/, TT.V2, { push: 'variable' });
 /** a rule for the end of the variable state */
-const RULE_VAR_END = r(/\}/, 'variable-2');
+const RULE_VAR_END = r(/\}/, TT.V2);
 
 /** a rule for a number */
-const RULE_NUM = r(VAR_NUM, 'number');
+const RULE_NUM = r(VAR_NUM, TT.NB);
 
 /** a rule for starting a single quote */
-const RULE_SINGLE_STRING_START = r(/'/, 'string', { push: 'single_string' });
+const RULE_SINGLE_STRING_START = r(/'/, TT.ST, { push: 'single_string' });
 /** a rule for starting a double quote */
-const RULE_DOUBLE_STRING_START = r(/"/, 'string', { push: 'double_string' });
+const RULE_DOUBLE_STRING_START = r(/"/, TT.ST, { push: 'double_string' });
 
 /** a rule for capturing tags (and friends) in keyword/test/task definitions */
 const RULE_TAGS = r(
   /([|\s]*\s*)(\[\s*)(tags)(\s*\])(\s*\|?)/i,
-  ['bracket', 'meta', 'meta', 'meta', 'bracket'],
+  [TT.BK, TT.MT, TT.MT, TT.MT, TT.BK],
   { sol: true, push: 'tags' }
 );
 
 /** rule for special case of applying tags at the suite level */
 const RULE_SUITE_TAGS = r(
   /(force tags|default tags)(\t+|  +)/i,
-  ['meta', null],
+  [TT.MT, null],
   {
     push: 'tags',
     sol: true
@@ -131,72 +166,75 @@ const RULE_SUITE_TAGS = r(
 /** rule for special case of applying tags at the suite level (with pipes) */
 const RULE_SUITE_TAGS_PIPE = r(
   /(\| +)(force tags|default tags)( *\|?)/i,
-  ['bracket', 'meta', 'bracket'],
+  [TT.BK, TT.MT, TT.BK],
   { sol: true, push: 'tags' }
 );
 
 /** rule for bracketed settings of keyword/test/task */
 const RULE_SETTING_KEYWORD = r(
   /([|\s]*)(\[\s*)(setup|teardown|template)(\s*\])(\s*\|?)/i,
-  ['bracket', 'meta', 'meta', 'meta', 'bracket'],
+  [TT.BK, TT.MT, TT.MT, TT.MT, TT.BK],
   { push: 'keyword_invocation', sol: true }
 );
 
 /** rule for bracketed settings of keyword/test/task that include a keyword */
 const RULE_SUITE_SETTING_KEYWORD = r(
   /(suite setup|suite teardown|test setup|test teardown|test template|task setup|task teardown|task template)(\t+|  +)/i,
-  ['meta', null],
+  [TT.MT, null],
   { push: 'keyword_invocation', sol: true }
 );
 
 /** rule for bracketed settings of keyword/test/task that include a keyword (with pipes) */
 const RULE_SUITE_SETTING_KEYWORD_PIPE = r(
   /(\| +)(suite setup|suite teardown|test setup|test teardown|test template|task setup|task teardown|task template)( +\|)/i,
-  ['bracket', 'meta', 'bracket'],
+  [TT.BK, TT.MT, TT.BK],
   { push: 'keyword_invocation', sol: true }
 );
 
-const RULE_SETTING_LIBRARY = r(/(library)(\t+|  +)/i, ['meta', null], {
+const RULE_SETTING_LIBRARY = r(/(library)(\t+|  +)/i, [TT.MT, null], {
   push: 'library',
   sol: true
 });
 
 const RULE_SETTING_LIBRARY_PIPE = r(
   /(\| +)(library)( +\|)/i,
-  ['bracket', 'meta', 'bracket'],
-  { push: 'library', sol: true }
+  [TT.BK, TT.MT, TT.BK],
+  {
+    push: 'library',
+    sol: true
+  }
 );
 
 /** rule to escape the final closing bracket of a var at the end of a line */
-const RULE_LINE_ENDS_WITH_VAR = r(/\}(?=$)/, 'variable-2', { pop: true });
+const RULE_LINE_ENDS_WITH_VAR = r(/\}(?=$)/, TT.MT, { pop: true });
 
 /** collects the states that we build */
-const states: IStates = {};
+const states: Partial<IStates> = {};
 
 /** base isn't a state. these are the "normal business" that any state might use */
 const base = [
   ...RULES_TABLE,
   RULE_VAR_START,
   RULE_VAR_END,
-  r(/\|/, 'bracket'),
-  r(/#.*$/, 'comment'),
-  r(/\\ +/, 'bracket'),
-  r(/\\(?=$)/, 'bracket'),
-  r(/([^\s=]*)(=)/, ['attribute', 'operator']),
-  r(/_\*.*?\*_/, 'string.strong.em'),
-  r(/\*.*?\*/, 'string.strong'),
-  r(/\_.*?\_/, 'string.em'),
+  r(/\|/, TT.BK),
+  r(/#.*$/, TT.CM),
+  r(/\\ +/, TT.BK),
+  r(/\\(?=$)/, TT.BK),
+  r(/([^\s=]*)(=)/, [TT.AT, TT.OP]),
+  r(/_\*.*?\*_/, TT.SSE),
+  r(/\*.*?\*/, TT.SS),
+  r(/\_.*?\_/, TT.SE),
   // this is pretty extreme, but seems to work
-  r(/[^\s\$]+/, 'string')
+  r(/[^\s\$]+/, TT.ST)
 ];
 
 /** the starting state (begining of a file) */
 states.start = [
-  r(/(%%python)( module )?(.*)?/, ['meta', 'keyword', 'variable'], {
+  r(/(%%python)( module )?(.*)?/, [TT.MT, TT.KW, TT.V2], {
     mode: { spec: 'ipython' },
     sol: true
   }),
-  r(/(%%[^\s]*).*$/, 'meta', { sol: true }),
+  r(/(%%[^\s]*).*$/, TT.MT, { sol: true }),
   ...base
 ];
 
@@ -210,7 +248,7 @@ states.settings = [
   RULE_SETTING_LIBRARY_PIPE,
   r(
     /(\|*\s*)(resource|variables|documentation|metadata|test timeout|task timeout)(\s*)/i,
-    ['bracket', 'meta', null],
+    [TT.BK, TT.MT, null],
     { sol: true }
   ),
   ...base
@@ -218,18 +256,18 @@ states.settings = [
 
 states.library = [
   RULE_LINE_ENDS_WITH_VAR,
-  r(/WITH NAME$/, 'atom', { pop: true }),
-  r(/WITH NAME/, 'atom'),
-  r(/[^\}\|\s]*$/, 'string', { pop: true }),
+  r(/WITH NAME$/, TT.AM, { pop: true }),
+  r(/WITH NAME/, TT.AM),
+  r(/[^\}\|\s]*$/, TT.ST, { pop: true }),
   ...base
 ];
 
-const RULE_ELLIPSIS = r(/(\s*)(\.\.\.)/, [null, 'bracket']);
+const RULE_ELLIPSIS = r(/(\s*)(\.\.\.)/, [null, TT.BK]);
 
 /** rule for behavior-driven-development keywords */
 const RULE_START_BDD = r(
   /(\|\s*\|\s*|\s\s+)?(given|when|then|and|but)/i,
-  ['bracket', 'builtin.em'],
+  [TT.BK, TT.BE],
   {
     push: 'keyword_invocation',
     sol: true
@@ -241,14 +279,14 @@ const RULE_KEY_START = r(/(\t+|  +)(?!\.\.\.)/, null, {
   sol: true
 });
 /** rule for pipe keywords */
-const RULE_KEY_START_PIPE = r(/(\|\s*\|)(\s+)/, ['bracket', null], {
+const RULE_KEY_START_PIPE = r(/(\|\s*\|)(\s+)/, [TT.BK, null], {
   push: 'keyword_invocation',
   sol: true
 });
 /** rule for for old-style loops (slashes) */
 const RULE_START_LOOP_OLD = r(
   /(\s\|*\s*)(:FOR)(\s\|*\s*)/,
-  [null, 'atom', null],
+  [null, TT.AM, null],
   {
     push: 'loop_start_old',
     sol: true
@@ -257,7 +295,7 @@ const RULE_START_LOOP_OLD = r(
 /** rule for for new-style loops (slashes) */
 const RULE_START_LOOP_NEW = r(
   /(\s\|*\s*)(FOR)(\s\|*\s*)/,
-  [null, 'atom', null],
+  [null, TT.AM, null],
   {
     push: 'loop_start_new',
     sol: true
@@ -266,17 +304,17 @@ const RULE_START_LOOP_NEW = r(
 
 /** rules for capturing individual tags */
 states.tags = [
-  r(/\s\|\s*/, 'bracket'),
+  r(/\s\|\s*/, TT.BK),
   r(/^($|\n)/, null, { pop: true }),
   RULE_VAR_START,
   RULE_LINE_ENDS_WITH_VAR,
   RULE_VAR_END,
   r(/^\s*(?=$)/, null, { pop: true }),
   r(/ +/, null),
-  r(/[^\$&%@]*?(?=(  +| \|))/, 'tag'),
-  r(/[^\$&%@]*?(?=\s*\|?$)/, 'tag', { pop: true }),
+  r(/[^\$&%@]*?(?=(  +| \|))/, TT.TG),
+  r(/[^\$&%@]*?(?=\s*\|?$)/, TT.TG, { pop: true }),
   // fall back to single char
-  r(/[^\$&%@|]/, 'tag')
+  r(/[^\$&%@|]/, TT.TG)
 ];
 
 /** need to catch empty white lines pretty explicitly */
@@ -298,7 +336,7 @@ states.keywords = [
   RULE_SETTING_KEYWORD,
   r(
     /([\|\s]*\s*)(\[\s*)(arguments|documentation|return|timeout)(\s*\])(\s*\|?)/i,
-    ['bracket', 'meta', 'meta', 'meta', 'bracket'],
+    [TT.BK, TT.MT, TT.MT, TT.MT, TT.BK],
     { sol: true }
   ),
   r(/(?=[^\s$&%@*|]+)/, null, { sol: true, push: 'keyword_def' }),
@@ -318,29 +356,29 @@ const KEYWORD_WORD_BEFORE_WS = /([^\n\$\s*=\|]+?(?= ))/i;
 
 states.keyword_def = [
   RULE_VAR_START,
-  r(/\}(?=$)/, 'variable-2'),
+  r(/\}(?=$)/, TT.V2),
   RULE_VAR_END,
   r(/ /, null),
-  r(KEYWORD_WORD_BEFORE_VAR, 'def'),
-  r(KEYWORD_WORD_BEFORE_SEP, 'def', { pop: true }),
-  r(KEYWORD_WORD_BEFORE_WS, 'def'),
+  r(KEYWORD_WORD_BEFORE_VAR, TT.DF),
+  r(KEYWORD_WORD_BEFORE_SEP, TT.DF, { pop: true }),
+  r(KEYWORD_WORD_BEFORE_WS, TT.DF),
   r(/(?=$)/, null, { sol: true, pop: true })
 ];
 
 /** A range as used in for loops */
 const RULE_RANGE = r(/([\|\s]*\s*)(IN)( RANGE| ENUMERATE| ZIP)?/, [
   null,
-  'atom',
-  'atom'
+  TT.AM,
+  TT.AM
 ]);
 
 states.loop_start_new = [
   RULE_RANGE,
-  r(/[.]{3}/, 'bracket'),
+  r(/[.]{3}/, TT.BK),
   RULE_VAR_START,
-  r(/\}(?=$)/, 'variable-2'),
+  r(/\}(?=$)/, TT.V2),
   RULE_VAR_END,
-  r(/([\|\s]*\s*)(END)/, [null, 'atom'], { sol: true, pop: true }),
+  r(/([\|\s]*\s*)(END)/, [null, TT.AM], { sol: true, pop: true }),
   RULE_WS_LINE,
   ...RULES_KEYWORD_INVOKING,
   ...base
@@ -350,7 +388,7 @@ states.loop_start_old = [
   r(/(?=.*)/, null, { sol: true, next: 'loop_body_old' }),
   RULE_RANGE,
   RULE_VAR_START,
-  r(/\}(?=$)/, 'variable-2'),
+  r(/\}(?=$)/, TT.V2),
   RULE_VAR_END,
   ...base
 ];
@@ -365,8 +403,8 @@ states.loop_body_old = [
       ),
       token:
         rule.token instanceof Array
-          ? [null, 'bracket', ...rule.token]
-          : [null, 'bracket', rule.token]
+          ? [null, TT.BK, ...rule.token]
+          : [null, TT.BK, rule.token]
     };
   }),
   r(/(?=\s+[^\\])/, null, { pop: true, sol: true }),
@@ -380,22 +418,18 @@ states.test_cases = [
   RULE_SETTING_KEYWORD,
   r(
     /([\|\s]*\s*)(\[\s*)(documentation|timeout)(\s*\])/i,
-    ['bracket', 'meta', 'meta', 'meta'],
+    [TT.BK, TT.MT, TT.MT, TT.MT],
     { sol: true }
   ),
   RULE_START_LOOP_OLD,
   RULE_START_LOOP_NEW,
-  r(
-    /(\|\s+)([^\s*\|\.][^\|]*?)(\s*)(\|?$)/,
-    ['bracket', 'string.header', 'bracket'],
-    {
-      sol: true
-    }
-  ),
-  r(/(\| +)(.+?)( \| )/, ['bracket', 'string.header', 'bracket'], {
+  r(/(\|\s+)([^\s*\|\.][^\|]*?)(\s*)(\|?$)/, [TT.BK, TT.SH, TT.BK], {
     sol: true
   }),
-  r(/([^|\s*].+$)/, 'string.header', { sol: true }),
+  r(/(\| +)(.+?)( \| )/, [TT.BK, TT.SH, TT.BK], {
+    sol: true
+  }),
+  r(/([^|\s*].+$)/, TT.SH, { sol: true }),
   RULE_WS_LINE,
   ...RULES_KEYWORD_INVOKING,
   ...base
@@ -404,18 +438,18 @@ states.test_cases = [
 /** rules for inside of an invoked keyword instance */
 states.keyword_invocation = [
   r(/(?=\s*$)/, null, { pop: true }),
-  r(/(\\|\.\.\.) +/, 'bracket', { pop: true }),
+  r(/(\\|\.\.\.) +/, TT.BK, { pop: true }),
   RULE_VAR_START,
   RULE_LINE_ENDS_WITH_VAR,
   RULE_VAR_END,
-  r(/#.*$/, 'comment', { pop: true }),
-  r(/( \| |  +|\t+)(?=[$@&])/, 'bracket'),
-  r(/( \| |  +|\t+)/, 'bracket', { pop: true }),
-  r(/( ?)(=)(\t+|  +)/, [null, 'operator', null]),
+  r(/#.*$/, TT.CM, { pop: true }),
+  r(/( \| |  +|\t+)(?=[$@&])/, TT.BK),
+  r(/( \| |  +|\t+)/, TT.BK, { pop: true }),
+  r(/( ?)(=)(\t+|  +)/, [null, TT.OP, null]),
   r(/ /, null),
-  r(KEYWORD_WORD_BEFORE_VAR, 'keyword', { pop: true }),
-  r(KEYWORD_WORD_BEFORE_SEP, 'keyword', { pop: true }),
-  r(KEYWORD_WORD_BEFORE_WS, 'keyword'),
+  r(KEYWORD_WORD_BEFORE_VAR, TT.KW, { pop: true }),
+  r(KEYWORD_WORD_BEFORE_SEP, TT.KW, { pop: true }),
+  r(KEYWORD_WORD_BEFORE_WS, TT.KW),
   ...base
 ];
 
@@ -425,15 +459,15 @@ states.variables = [...base];
 /** rules for inside of a variable reference */
 states.variable = [
   RULE_VAR_START,
-  r(VAR_BUILTIN, 'builtin'),
+  r(VAR_BUILTIN, TT.BI),
   RULE_NUM,
-  r(VAR_OP, 'operator'),
-  r(/\./, 'operator', { push: 'variable_property' }),
-  r(/\[/, 'bracket', { next: 'variable_index' }),
-  r(/\}(?=\[)/, 'variable-2'),
+  r(VAR_OP, TT.OP),
+  r(/\./, TT.OP, { push: 'variable_property' }),
+  r(/\[/, TT.BK, { next: 'variable_index' }),
+  r(/\}(?=\[)/, TT.V2),
   r(/(?=\}$)/, null, { pop: true }),
-  r(/\}/, 'variable-2', { pop: true }),
-  r(/[^\{\}\n]/, 'variable-2')
+  r(/\}/, TT.V2, { pop: true }),
+  r(/[^\{\}\n]/, TT.V2)
 ];
 
 /** rules for extended syntax in a variable reference */
@@ -443,28 +477,28 @@ states.variable_property = [
   RULE_NUM,
   RULE_SINGLE_STRING_START,
   RULE_DOUBLE_STRING_START,
-  r(VAR_OP, 'operator'),
-  r(/\(/, 'bracket'),
-  r(/\)/, 'bracket', { pop: true }),
-  r(/([a-z_][a-z_\d]*)(=)/i, ['variable-2', 'operator']),
-  r(/,/, 'punctuation'),
-  r(/[^}](?=\})/, 'property', { pop: true }),
-  r(/(\})(\s*(?=$|\n))/, ['bracket', null], { pop: true }),
+  r(VAR_OP, TT.OP),
+  r(/\(/, TT.BK),
+  r(/\)/, TT.BK, { pop: true }),
+  r(/([a-z_][a-z_\d]*)(=)/i, [TT.V2, TT.OP]),
+  r(/,/, TT.PC),
+  r(/[^}](?=\})/, TT.PR, { pop: true }),
+  r(/(\})(\s*(?=$|\n))/, [TT.BK, null], { pop: true }),
   r(/\t*(?=$|\n)/, null, { pop: true }),
-  r(/[^}]/, 'property')
+  r(/[^}]/, TT.PR)
 ];
 
 /** rules for strings with single quotes */
 states.single_string = [
-  r(/\\'/, 'string'),
-  r(/'/, 'string', { pop: true }),
-  r(/./, 'string')
+  r(/\\'/, TT.ST),
+  r(/'/, TT.ST, { pop: true }),
+  r(/./, TT.ST)
 ];
 /** rules for strings with double quotes */
 states.double_string = [
-  r(/\\"/, 'string'),
-  r(/"/, 'string', { pop: true }),
-  r(/./, 'string')
+  r(/\\"/, TT.ST),
+  r(/"/, TT.ST, { pop: true }),
+  r(/./, TT.ST)
 ];
 
 /** rules for square-bracketed index referencing */
@@ -472,12 +506,12 @@ states.variable_index = [
   RULE_VAR_START,
   RULE_VAR_END,
   RULE_NUM,
-  r(/\[/, 'bracket'),
-  r(/\](?=\])/, 'bracket'),
-  r(/(\])(\})( ?=?)/, ['bracket', 'variable-2', 'operator'], { pop: true }),
-  r(/(\])(\[)/, 'bracket'),
-  r(/\]/, 'bracket', { pop: true }),
-  r(/[^\]]/, 'string')
+  r(/\[/, TT.BK),
+  r(/\](?=\])/, TT.BK),
+  r(/(\])(\})( ?=?)/, [TT.BK, TT.V2, TT.OP], { pop: true }),
+  r(/(\])(\[)/, TT.BK),
+  r(/\]/, TT.BK, { pop: true }),
+  r(/[^\]]/, TT.ST)
 ];
 
 /** well-known mime type for robot framework (pygments, etc.) */
