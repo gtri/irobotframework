@@ -413,7 +413,7 @@ states.keyword_invocation = [
   r(/( \| |  +|\t+)/, 'bracket', { pop: true }),
   r(/( ?)(=)(\t+|  +)/, [null, 'operator', null]),
   r(/ /, null),
-  r(KEYWORD_WORD_BEFORE_VAR, 'keyword'),
+  r(KEYWORD_WORD_BEFORE_VAR, 'keyword', { pop: true }),
   r(KEYWORD_WORD_BEFORE_SEP, 'keyword', { pop: true }),
   r(KEYWORD_WORD_BEFORE_WS, 'keyword'),
   ...base
