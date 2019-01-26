@@ -41,27 +41,27 @@ export type TState =
 
 /** the tokens we use */
 export enum TT {
-  V2 = 'variable-2',
-  BK = 'bracket',
-  NB = 'number',
-  ST = 'string',
-  MT = 'meta',
-  CM = 'comment',
-  AT = 'attribute',
   AM = 'atom',
-  OP = 'operator',
-  SSE = 'string.strong.em',
-  SS = 'string.strong',
-  SE = 'string.em',
-  SH = 'string.header',
-  KW = 'keyword',
+  AT = 'attribute',
   BE = 'builtin.em',
-  TG = 'tag',
+  BI = 'builtin',
+  BK = 'bracket',
+  CM = 'comment',
   DF = 'def',
   HL = 'header.link',
-  PR = 'property',
+  KW = 'keyword',
+  MT = 'meta',
+  NB = 'number',
+  OP = 'operator',
   PC = 'punctuation',
-  BI = 'builtin'
+  PR = 'property',
+  SE = 'string.em',
+  SH = 'string.header',
+  SS = 'string.strong',
+  SSE = 'string.strong.em',
+  ST = 'string',
+  TG = 'tag',
+  V2 = 'variable-2'
 }
 
 /**
