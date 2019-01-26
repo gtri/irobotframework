@@ -89,11 +89,6 @@ const RULES_TABLE: ISimpleState[] = Object.keys(TABLE_NAMES).map(
   }
 );
 
-/** Pattern to match the start of a variable */
-const VAR_START = /[\$&@%]\{/;
-/** Pattern to match the end of a variable */
-const VAR_END = /\}/;
-
 /** Valid python operators */
 const VAR_OP = /[*\-+\\%&|=><!]/;
 /** Valid python numbers */
@@ -105,9 +100,9 @@ const VAR_NUM = /0(b[01]+|o[0-7]+|x[0-9a-f]+)|(\d+)(\.\d+)?(e-?(\d+)(\.\d+)?)?/i
 const VAR_BUILTIN = /(none|(cur|temp|exec)dir|\/|:|\\n|true|empty|false|null|space|test (name|documentation|status|message|tags)|prev test (name|status|message)|suite (name|source|documentation|status|message|metadata)|keyword (status|message)|(report|debug) file|log (file|level)|output (dir|file))(?=[.}]|\s+[*\-+\\%&|=><!])/i;
 
 /** a rule for the beginning of the variable state */
-const RULE_VAR_START = r(VAR_START, 'variable-2', { push: 'variable' });
+const RULE_VAR_START = r(/[\$&@%]\{/, 'variable-2', { push: 'variable' });
 /** a rule for the end of the variable state */
-const RULE_VAR_END = r(VAR_END, 'variable-2');
+const RULE_VAR_END = r(/\}/, 'variable-2');
 
 /** a rule for a number */
 const RULE_NUM = r(VAR_NUM, 'number');
@@ -414,7 +409,8 @@ states.keyword_invocation = [
   RULE_LINE_ENDS_WITH_VAR,
   RULE_VAR_END,
   r(/#.*$/, 'comment', { pop: true }),
-  r(/( \| |  +)/, 'bracket', { pop: true }),
+  r(/( \| |  +|\t+)(?=[$@&])/, 'bracket'),
+  r(/( \| |  +|\t+)/, 'bracket', { pop: true }),
   r(/( ?)(=)(\t+|  +)/, [null, 'operator', null]),
   r(/ /, null),
   r(KEYWORD_WORD_BEFORE_VAR, 'keyword'),
@@ -435,8 +431,9 @@ states.variable = [
   r(/\./, 'operator', { push: 'variable_property' }),
   r(/\[/, 'bracket', { next: 'variable_index' }),
   r(/\}(?=\[)/, 'variable-2'),
-  r(/[^}\n$]/, 'variable-2'),
-  r(/^(?=\})/, 'variable-2', { pop: true })
+  r(/(?=\}$)/, null, { pop: true }),
+  r(/\}/, 'variable-2', { pop: true }),
+  r(/[^\{\}\n]/, 'variable-2')
 ];
 
 /** rules for extended syntax in a variable reference */
@@ -452,8 +449,8 @@ states.variable_property = [
   r(/([a-z_][a-z_\d]*)(=)/i, ['variable-2', 'operator']),
   r(/,/, 'punctuation'),
   r(/[^}](?=\})/, 'property', { pop: true }),
-  r(/(^\})(\s*(?=$|\n))/, ['bracket', null], { pop: true }),
-  r(/^\t*(?=$|\n)/, null, { pop: true }),
+  r(/(\})(\s*(?=$|\n))/, ['bracket', null], { pop: true }),
+  r(/\t*(?=$|\n)/, null, { pop: true }),
   r(/[^}]/, 'property')
 ];
 
