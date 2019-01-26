@@ -50,6 +50,20 @@ Cell Source Should Contain
     ${result} =  Get Cell Source
     Should Contain    ${result}  ${text}
 
+Cell Source Tokens Should Equal
+    [Documentation]   Whether a cell is highlighted as expected
+    [Arguments]  ${expected_tokens}
+    ${observed_tokens} =  Get Cell Source Tokens
+    Should Be Equal As Numbers    ${observed_tokens.__len__()}    ${expected_tokens.__len__()}
+    FOR  ${i}  ${el}  IN ENUMERATE  @{observed_tokens}
+      Element Should Only Have Classes  ${el}  ${expected_tokens[${i}]}
+    END
+
+Get Cell Source Tokens
+    [Documentation]   Extract the current cell tokens
+    ${els} =  Get WebElements    css:${VISIBLE_NOTEBOOK} ${CELL_CSS} .CodeMirror-lines span[class^='cm-']
+    [Return]  ${els}
+
 Trigger Cell Source Completion
     [Documentation]   Initiate Tab Complete
     Press Key  css:body  \\9
