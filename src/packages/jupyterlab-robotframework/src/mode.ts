@@ -64,9 +64,9 @@ export enum TT {
   V2 = 'variable-2'
 }
 
-// function LINK(token: TT): TT {
-//   return (token + '.link') as any;
-// }
+export function LINK(token: TT): TT {
+  return (token + '.link') as any;
+}
 
 /**
   An implementation of the CodeMirror simple mode object
@@ -212,6 +212,8 @@ const RULE_SETTING_LIBRARY_PIPE = r(
 /** rule to escape the final closing bracket of a var at the end of a line */
 const RULE_LINE_ENDS_WITH_VAR = r(/\}\s*(?=$)/, TT.V2, { pop: true });
 
+const RULE_ELLIPSIS = r(/(\s*)(\.\.\.)/, [null, TT.BK], { sol: true });
+
 /** collects the states that we build */
 const states: Partial<IStates> = {};
 
@@ -220,6 +222,7 @@ const base = [
   ...RULES_TABLE,
   RULE_VAR_START,
   RULE_VAR_END,
+  RULE_ELLIPSIS,
   r(/\|/, TT.BK),
   r(/#.*$/, TT.CM),
   r(/\\ +/, TT.BK),
@@ -266,8 +269,6 @@ states.library = [
   ...base
 ];
 
-const RULE_ELLIPSIS = r(/(\s*)(\.\.\.)/, [null, TT.BK]);
-
 /** rule for behavior-driven-development keywords */
 const RULE_START_BDD = r(
   /(\|\s*\|\s*|\s\s+)?(given|when|then|and|but)/i,
@@ -313,14 +314,15 @@ const RULE_START_LOOP_NEW = r(
 /** rules for capturing individual tags */
 states.tags = [
   r(/\s\|\s*/, TT.BK),
-  r(/^($|\n)/, null, { pop: true }),
+  RULE_ELLIPSIS,
+  r(/(?!\.\.\.)/, null, { sol: true, pop: true }),
   RULE_VAR_START,
   RULE_LINE_ENDS_WITH_VAR,
   RULE_VAR_END,
-  r(/^\s*(?=$)/, null, { pop: true }),
+  // r(/\s*(?=$)/, null, { pop: true }),
   r(/ +/, null),
   r(/[^\$&%@]*?(?=(  +| \|))/, TT.TG),
-  r(/[^\$&%@]*?(?=\s*\|?$)/, TT.TG, { pop: true }),
+  // r(/[^\$&%@]*?(?=\s*\|?$)/, TT.TG, { pop: true }),
   // fall back to single char
   r(/[^\$&%@|]/, TT.TG)
 ];
