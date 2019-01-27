@@ -76,8 +76,6 @@ commands:
         && python -m robot \
           -d ../../_testoutput \
           --xunit junit_robot.xml \
-          --include feature:highlighting \
-          -X \
           .
     env_spec: test
   test:release:
@@ -140,6 +138,7 @@ env_specs:
       - black
       - flake8
       - geckodriver
+      - hypothesis
       - jupyter_kernel_test
       - pylint
       - pytest
