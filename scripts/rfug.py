@@ -66,7 +66,7 @@ def rfug_fixtures():
 
     tree = build_tree()
     lines = write_fixtures(tree)
-    print(lines)
+    print("\n".join(lines))
 
     return 0
 
