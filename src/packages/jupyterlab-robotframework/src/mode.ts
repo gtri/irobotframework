@@ -213,6 +213,10 @@ const RULE_SETTING_LIBRARY_PIPE = r(
 const RULE_LINE_ENDS_WITH_VAR = r(/\}\s*(?=$)/, TT.V2, { pop: true });
 
 const RULE_ELLIPSIS = r(/(\s*)(\.\.\.)/, [null, TT.BK], { sol: true });
+const RULE_NOT_ELLIPSIS_POP = r(/(?!\s*\.\.\.)/, null, {
+  pop: true,
+  sol: true
+});
 
 /** collects the states that we build */
 const states: Partial<IStates> = {};
@@ -263,10 +267,17 @@ states.settings = [
 ];
 
 states.library = [
+  RULE_NOT_ELLIPSIS_POP,
+  RULE_ELLIPSIS,
   RULE_LINE_ENDS_WITH_VAR,
-  r(/WITH NAME$/, TT.AM, { pop: true }),
-  r(/WITH NAME/, TT.AM),
-  r(/[^\}\|\s]*$/, TT.ST, { pop: true }),
+  r(
+    /(WITH NAME)(\t+|  +| +\| +)([^\|\s]*)(\s*)(\|?)(\s*)(?=$)/,
+    [TT.AM, TT.BK, TT.DF, null, TT.BK, null],
+    {
+      pop: true
+    }
+  ),
+  // r(/[^\}\|\s]*$/, TT.ST, { pop: true }),
   ...base
 ];
 
@@ -316,7 +327,7 @@ const RULE_START_LOOP_NEW = r(
 states.tags = [
   r(/\s\|\s*/, TT.BK),
   RULE_ELLIPSIS,
-  r(/(?!\.\.\.)/, null, { sol: true, pop: true }),
+  RULE_NOT_ELLIPSIS_POP,
   RULE_VAR_START,
   RULE_LINE_ENDS_WITH_VAR,
   RULE_VAR_END,
