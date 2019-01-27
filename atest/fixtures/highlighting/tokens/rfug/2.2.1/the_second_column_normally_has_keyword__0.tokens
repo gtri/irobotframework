@@ -5,11 +5,9 @@ keyword
 keyword
 keyword
 keyword
-bracket
 string
 keyword
 keyword
-bracket
 string
 keyword
 keyword
@@ -21,7 +19,6 @@ keyword
 header string
 keyword
 keyword
-bracket
 string
 string
 string
@@ -34,8 +31,6 @@ keyword
 keyword
 keyword
 keyword
-bracket
 variable-2
-bracket
 string
 string

@@ -20,19 +20,15 @@ meta
 string
 string
 keyword
-bracket
 variable-2
 keyword
 keyword
-bracket
 string
 header string
 keyword
 keyword
 keyword
-bracket
 variable-2
-bracket
 string
 string
 header link
@@ -43,5 +39,4 @@ variable-2
 keyword
 keyword
 keyword
-bracket
 variable-2

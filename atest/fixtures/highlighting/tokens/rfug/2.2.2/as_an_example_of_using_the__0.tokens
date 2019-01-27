@@ -2,13 +2,11 @@ header link
 header string
 keyword
 keyword
-bracket
 string
 string
 comment
 keyword
 keyword
-bracket
 string
 attribute
 operator
@@ -24,7 +22,6 @@ operator
 string
 keyword
 keyword
-bracket
 string
 variable-2
 attribute

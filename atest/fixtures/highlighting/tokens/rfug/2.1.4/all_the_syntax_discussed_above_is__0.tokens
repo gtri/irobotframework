@@ -57,7 +57,6 @@ tag
 tag
 keyword
 keyword
-bracket
 string
 string
 string
@@ -74,7 +73,6 @@ variable-2
 operator
 keyword
 keyword
-bracket
 string
 string
 string

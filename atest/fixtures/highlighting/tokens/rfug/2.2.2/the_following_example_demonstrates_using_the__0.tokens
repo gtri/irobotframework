@@ -11,7 +11,6 @@ header link
 header string
 keyword
 keyword
-bracket
 string
 attribute
 operator
@@ -21,13 +20,11 @@ operator
 string
 keyword
 keyword
-bracket
 attribute
 operator
 string
 keyword
 keyword
-bracket
 attribute
 operator
 string
@@ -45,7 +42,6 @@ variable-2
 operator
 keyword
 keyword
-bracket
 string
 variable-2
 variable-2

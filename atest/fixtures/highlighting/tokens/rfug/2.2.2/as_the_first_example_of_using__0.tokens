@@ -2,7 +2,6 @@ header link
 header string
 keyword
 keyword
-bracket
 string
 string
 string
@@ -11,7 +10,6 @@ operator
 string
 keyword
 keyword
-bracket
 string
 string
 attribute

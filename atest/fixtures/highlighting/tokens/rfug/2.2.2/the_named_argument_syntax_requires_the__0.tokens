@@ -2,7 +2,6 @@ header link
 header string
 keyword
 keyword
-bracket
 attribute
 operator
 string
@@ -14,7 +13,6 @@ meta
 variable-2
 keyword
 keyword
-bracket
 string
 variable-2
 comment

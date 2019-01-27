@@ -2,14 +2,12 @@ header link
 header string
 keyword
 keyword
-bracket
 string
 string
 bracket
 header string
 keyword
 keyword
-bracket
 string
 string
 variable-2
@@ -18,11 +16,9 @@ variable-2
 header string
 keyword
 keyword
-bracket
 variable-2
 builtin
 variable-2
-bracket
 string
 string
 comment
