@@ -64,6 +64,10 @@ export enum TT {
   V2 = 'variable-2'
 }
 
+// function LINK(token: TT): TT {
+//   return (token + '.link') as any;
+// }
+
 /**
   An implementation of the CodeMirror simple mode object
 
@@ -460,6 +464,7 @@ states.test_cases = [
 
 /** rules for inside of an invoked keyword instance */
 states.keyword_invocation = [
+  r(/( ?)(=)(\t+|  +|\s+\|)/, [null, TT.OP, null]),
   r(/(?=\s*$)/, null, { pop: true }),
   r(/(\\|\.\.\.) +/, TT.BK, { pop: true }),
   RULE_VAR_START,
@@ -468,7 +473,6 @@ states.keyword_invocation = [
   r(/#.*$/, TT.CM, { pop: true }),
   r(/( \| |  +|\t+)(?=[$@&])/, TT.BK),
   r(/( \| |  +|\t+)/, TT.BK, { pop: true }),
-  r(/( ?)(=)(\t+|  +)/, [null, TT.OP, null]),
   r(/ /, null),
   r(KEYWORD_WORD_BEFORE_VAR, TT.KW, { pop: true }),
   r(KEYWORD_WORD_BEFORE_SEP, TT.KW, { pop: true }),
