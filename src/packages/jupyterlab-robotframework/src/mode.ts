@@ -206,7 +206,7 @@ const RULE_SETTING_LIBRARY_PIPE = r(
 );
 
 /** rule to escape the final closing bracket of a var at the end of a line */
-const RULE_LINE_ENDS_WITH_VAR = r(/\}(?=$)/, TT.MT, { pop: true });
+const RULE_LINE_ENDS_WITH_VAR = r(/\}\s*(?=$)/, TT.V2, { pop: true });
 
 /** collects the states that we build */
 const states: Partial<IStates> = {};
@@ -279,10 +279,14 @@ const RULE_KEY_START = r(/(\t+|  +)(?!\.\.\.)/, null, {
   sol: true
 });
 /** rule for pipe keywords */
-const RULE_KEY_START_PIPE = r(/(\|\s*\|)(\s+)/, [TT.BK, null], {
-  push: 'keyword_invocation',
-  sol: true
-});
+const RULE_KEY_START_PIPE = r(
+  /(\| )(\s*)(|[^\|\s][^\|]*)(\s*)( \|)(\s+)/,
+  [TT.BK, null, TT.SH, null, TT.BK, null],
+  {
+    push: 'keyword_invocation',
+    sol: true
+  }
+);
 /** rule for for old-style loops (slashes) */
 const RULE_START_LOOP_OLD = r(
   /(\s\|*\s*)(:FOR)(\s\|*\s*)/,
@@ -329,16 +333,25 @@ const RULES_KEYWORD_INVOKING = [
   r(/(?=[^\s])/, null, { sol: true, push: 'keyword_invocation' })
 ];
 
+const RULE_SETTING_SIMPLE = r(
+  /(\t+|  +)(\[\s*)(arguments|documentation|return|timeout)(\s*\])(\s*)/i,
+  [null, TT.MT, TT.MT, TT.MT, null],
+  { sol: true }
+);
+
+const RULE_SETTING_SIMPLE_PIPE = r(
+  /(\|)(\s+)([^|*]*)(\s+)(\|)(\s+)(\[\s*)(arguments|documentation|return|timeout)(\s*\])(\s*)(\|?)/i,
+  [TT.BK, null, TT.SH, null, TT.BK, null, TT.MT, TT.MT, TT.MT, null, TT.BK],
+  { sol: true }
+);
+
 /** rules for data rows inside a keyword table */
 states.keywords = [
   RULE_ELLIPSIS,
   RULE_TAGS,
   RULE_SETTING_KEYWORD,
-  r(
-    /([\|\s]*\s*)(\[\s*)(arguments|documentation|return|timeout)(\s*\])(\s*\|?)/i,
-    [TT.BK, TT.MT, TT.MT, TT.MT, TT.BK],
-    { sol: true }
-  ),
+  RULE_SETTING_SIMPLE,
+  RULE_SETTING_SIMPLE_PIPE,
   r(/(?=[^\s$&%@*|]+)/, null, { sol: true, push: 'keyword_def' }),
   RULE_START_LOOP_OLD,
   RULE_START_LOOP_NEW,
@@ -411,27 +424,37 @@ states.loop_body_old = [
   ...base
 ];
 
+const RULE_CASE_SETTING_SIMPLE = r(
+  /(\t+|  +)(\[\s*)(documentation|timeout)(\s*\])(\s*)/i,
+  [null, TT.MT, TT.MT, TT.MT, null],
+  { sol: true }
+);
+
+const RULE_CASE_SETTING_SIMPLE_PIPE = r(
+  /(\|)(\s+)([^|*]*)(\s+)(\|)(\s+)(\[\s*)(documentation|timeout)(\s*\])(\s*)(\|?)/i,
+  [TT.BK, null, TT.SH, null, TT.BK, null, TT.MT, TT.MT, TT.MT, null, TT.BK],
+  { sol: true }
+);
+
 /** rules for data rows inside test/task definition */
 states.test_cases = [
+  ...RULES_TABLE,
   RULE_ELLIPSIS,
   RULE_TAGS,
   RULE_SETTING_KEYWORD,
-  r(
-    /([\|\s]*\s*)(\[\s*)(documentation|timeout)(\s*\])/i,
-    [TT.BK, TT.MT, TT.MT, TT.MT],
-    { sol: true }
-  ),
+  RULE_CASE_SETTING_SIMPLE,
+  RULE_CASE_SETTING_SIMPLE_PIPE,
   RULE_START_LOOP_OLD,
   RULE_START_LOOP_NEW,
+  r(/([^|\s*].+?)(?=(\t|  +|$))/, TT.SH, { sol: true }),
+  ...RULES_KEYWORD_INVOKING,
   r(/(\|\s+)([^\s*\|\.][^\|]*?)(\s*)(\|?$)/, [TT.BK, TT.SH, TT.BK], {
     sol: true
   }),
-  r(/(\| +)(.+?)( \| )/, [TT.BK, TT.SH, TT.BK], {
+  r(/(\| +)([^\|\s].+?)(\s*)( \| )/, [TT.BK, TT.SH, null, TT.BK], {
     sol: true
   }),
-  r(/([^|\s*].+$)/, TT.SH, { sol: true }),
   RULE_WS_LINE,
-  ...RULES_KEYWORD_INVOKING,
   ...base
 ];
 
@@ -465,7 +488,7 @@ states.variable = [
   r(/\./, TT.OP, { push: 'variable_property' }),
   r(/\[/, TT.BK, { next: 'variable_index' }),
   r(/\}(?=\[)/, TT.V2),
-  r(/(?=\}$)/, null, { pop: true }),
+  r(/(?=\}\s*$)/, null, { pop: true }),
   r(/\}/, TT.V2, { pop: true }),
   r(/[^\{\}\n]/, TT.V2)
 ];
