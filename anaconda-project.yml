@@ -48,6 +48,9 @@ commands:
       && cd src/packages/jupyterlab-robotframework \
       && mv $(npm pack) ../../../dist/npm/
     env_spec: test
+  build:rfug:
+    unix: python -m scripts.rfug
+    env_spec: docs
   jlpm:
     description: run the yarn bundled with JupyterLab
     unix: jlpm
@@ -73,6 +76,8 @@ commands:
         && python -m robot \
           -d ../../_testoutput \
           --xunit junit_robot.xml \
+          --include feature:highlighting \
+          -X \
           .
     env_spec: test
   test:release:
@@ -89,9 +94,9 @@ commands:
         --configure TooManyTestSteps:20 \
         --configure TooFewKeywordSteps:0 \
         --configure LineTooLong:200 \
-        atest/{acceptance,resources}/*.robot \
+        -r atest/{acceptance,resources}/*.robot \
       && black --line-length 88 setup.py ./src/irobotframework/ scripts docs \
-      && flake8 --max-line-length=88 \
+      && flake8 --max-line-length=88 scripts src/irobotframework setup.py docs \
       && jlpm lint
     env_spec: test
   release:pypi:
@@ -148,6 +153,9 @@ env_specs:
       - default
     packages:
       - nbsphinx
+      - lxml
       - sphinx
       - sphinx_rtd_theme
       - sphinx-autobuild
+      - pip:
+          - robotframeworklexer
