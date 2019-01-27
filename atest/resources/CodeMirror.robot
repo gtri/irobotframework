@@ -2,6 +2,7 @@
 *** Settings ***
 Documentation     JupyterLab Notebook activities
 Library           SeleniumLibrary
+Library           Collections
 Resource          Lab.robot
 
 *** Variables ***
@@ -18,7 +19,7 @@ Evaluate Cell CodeMirror
 Set Cell Source
     [Documentation]   Set the source of a cell
     [Arguments]   ${code}
-    ${result} =   Evaluate Cell CodeMirror    setValue(`${code}`)
+    ${result} =   Evaluate Cell CodeMirror    setValue(${code.split("\n")}.join("\\n"))
     [Return]   ${result}
 
 Append to Cell Source
@@ -61,8 +62,15 @@ Cell Source Tokens Should Equal
 
 Get Cell Source Tokens
     [Documentation]   Extract the current cell tokens
+    ${tokens} =  Create List
     ${els} =  Get WebElements    css:${VISIBLE_NOTEBOOK} ${CELL_CSS} .CodeMirror-lines span[class^='cm-']
-    [Return]  ${els}
+    FOR  ${el}  IN  @{els}
+      ${raw_classes} =   Call Method    ${el}   get_attribute   class
+      ${observed} =  Set Variable  ${raw_classes.replace("cm-", "").split(" ")}
+      ${sorted} =  Evaluate  sorted(${observed})
+      Append To List    ${tokens}  ${sorted}
+    END
+    [Return]  ${tokens}
 
 Trigger Cell Source Completion
     [Documentation]   Initiate Tab Complete
