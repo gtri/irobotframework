@@ -232,7 +232,8 @@ const base = [
   r(/\*.*?\*/, TT.SS),
   r(/\_.*?\_/, TT.SE),
   // this is pretty extreme, but seems to work
-  r(/[^\s\$]+/, TT.ST)
+  r(/[^\s\$@%&]+/, TT.ST),
+  r(/[\$@%&](?!\{)/, TT.ST)
 ];
 
 /** the starting state (begining of a file) */
