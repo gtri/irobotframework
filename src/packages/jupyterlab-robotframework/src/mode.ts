@@ -480,6 +480,7 @@ states.test_cases = [
 states.keyword_invocation = [
   r(/( ?)(=)(\t+|  +|\s+\|)/, [null, TT.OP, null]),
   r(/(?=\s*$)/, null, { pop: true }),
+  RULE_NOT_ELLIPSIS_POP,
   r(/(\\|\.\.\.) +/, TT.BK, { pop: true }),
   RULE_VAR_START,
   RULE_LINE_ENDS_WITH_VAR,
