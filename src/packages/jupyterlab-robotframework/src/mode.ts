@@ -213,7 +213,7 @@ const RULE_SETTING_LIBRARY_PIPE = r(
 const RULE_LINE_ENDS_WITH_VAR = r(/\}\s*(?=$)/, TT.V2, { pop: true });
 
 const RULE_ELLIPSIS = r(/(\s*)(\.\.\.)/, [null, TT.BK], { sol: true });
-const RULE_NOT_ELLIPSIS_POP = r(/(?!\s*\.\.\.)/, null, {
+const RULE_NOT_ELLIPSIS_POP = r(/(?!\s*(\\|\.\.\.))/, null, {
   pop: true,
   sol: true
 });
@@ -347,8 +347,8 @@ const RULES_KEYWORD_INVOKING = [
   RULE_START_BDD,
   RULE_KEY_START_PIPE,
   RULE_KEY_START,
-  r(/\|\s(?=[^\s]*\|)/, null, { sol: true, push: 'keyword_invocation' }),
-  r(/(?=[^\s])/, null, { sol: true, push: 'keyword_invocation' })
+  r(/\|\s(?=[^\s*]*\|)/, null, { sol: true, push: 'keyword_invocation' }),
+  r(/(?=[^\s*])/, null, { sol: true, push: 'keyword_invocation' })
 ];
 
 const RULE_SETTING_SIMPLE = r(
