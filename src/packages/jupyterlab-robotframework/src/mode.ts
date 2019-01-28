@@ -36,6 +36,7 @@ export type TState =
   | 'single_string'
   | 'start'
   | 'tags'
+  | 'tags_comma'
   | 'variable_index'
   | 'variable_property'
   | 'variable';
@@ -221,6 +222,8 @@ const RULE_NOT_ELLIPSIS_POP = r(/(?!\s*(\\|\.\.\.))/, null, {
   sol: true
 });
 
+const RULE_DOC_TAGS = r(/(Tags:)(\s*)/i, [TT.MT, null], { push: 'tags_comma' });
+
 /** collects the states that we build */
 const states: Partial<IStates> = {};
 
@@ -229,6 +232,7 @@ const base = [
   ...RULES_TABLE,
   RULE_VAR_START,
   RULE_VAR_END,
+  RULE_DOC_TAGS,
   RULE_ELLIPSIS,
   r(/\|/, TT.BK),
   r(/#.*$/, TT.CM),
@@ -326,8 +330,7 @@ const RULE_START_LOOP_NEW = r(
   }
 );
 
-/** rules for capturing individual tags */
-states.tags = [
+const RULES_TAGS_COMMON = [
   r(/\s\|\s*/, TT.BK),
   RULE_COMMENT_POP,
   RULE_ELLIPSIS,
@@ -335,12 +338,24 @@ states.tags = [
   RULE_VAR_START,
   RULE_LINE_ENDS_WITH_VAR,
   RULE_VAR_END,
-  // r(/\s*(?=$)/, null, { pop: true }),
-  r(/ +/, null),
+  r(/ +/, null)
+];
+
+/** rules for capturing individual tags */
+states.tags = [
+  ...RULES_TAGS_COMMON,
   r(/[^\$&%@]*?(?=(  +| \|))/, TT.TG),
-  // r(/[^\$&%@]*?(?=\s*\|?$)/, TT.TG, { pop: true }),
   // fall back to single char
   r(/[^\$&%@|]/, TT.TG)
+];
+
+/** rules for capturing tags inside docs */
+states.tags_comma = [
+  ...RULES_TAGS_COMMON,
+  r(/(,)(\s*)/, [TT.PC, null]),
+  r(/[^\$&%@,]+(?=,$)/, TT.TG),
+  // fall back to single char
+  r(/[^\$&%@|,]/, TT.TG)
 ];
 
 /** need to catch empty white lines pretty explicitly */
