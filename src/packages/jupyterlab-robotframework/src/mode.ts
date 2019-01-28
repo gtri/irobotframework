@@ -28,6 +28,7 @@ export type TState =
   | 'double_string'
   | 'keyword_def'
   | 'keyword_invocation'
+  | 'keyword_invocation_no_continue'
   | 'library'
   | 'loop_body_old'
   | 'loop_start_new'
@@ -128,6 +129,8 @@ const RULES_TABLE = Object.keys(TABLE_NAMES).map((next: TMainState) => {
   });
 });
 
+const RULE_COMMENT_POP = r(/#.*$/, TT.CM, { pop: true });
+
 /** Valid python operators */
 const VAR_OP = /[*\-+\\%&|=><!]/;
 /** Valid python numbers */
@@ -178,7 +181,7 @@ const RULE_SUITE_TAGS_PIPE = r(
 const RULE_SETTING_KEYWORD = r(
   /([|\s]*)(\[\s*)(setup|teardown|template)(\s*\])(\s*\|?)/i,
   [TT.BK, TT.MT, TT.MT, TT.MT, TT.BK],
-  { push: 'keyword_invocation', sol: true }
+  { push: 'keyword_invocation_no_continue', sol: true }
 );
 
 /** rule for bracketed settings of keyword/test/task that include a keyword */
@@ -326,6 +329,7 @@ const RULE_START_LOOP_NEW = r(
 /** rules for capturing individual tags */
 states.tags = [
   r(/\s\|\s*/, TT.BK),
+  RULE_COMMENT_POP,
   RULE_ELLIPSIS,
   RULE_NOT_ELLIPSIS_POP,
   RULE_VAR_START,
@@ -480,12 +484,11 @@ states.test_cases = [
 states.keyword_invocation = [
   r(/( ?)(=)(\t+|  +|\s+\|)/, [null, TT.OP, null]),
   r(/(?=\s*$)/, null, { pop: true }),
-  RULE_NOT_ELLIPSIS_POP,
   r(/(\\|\.\.\.) +/, TT.BK, { pop: true }),
   RULE_VAR_START,
   RULE_LINE_ENDS_WITH_VAR,
   RULE_VAR_END,
-  r(/#.*$/, TT.CM, { pop: true }),
+  RULE_COMMENT_POP,
   r(/( \| |  +|\t+)(?=[$@&])/, TT.BK),
   r(/( \| |  +|\t+)/, TT.BK, { pop: true }),
   r(/ /, null),
@@ -493,6 +496,11 @@ states.keyword_invocation = [
   r(KEYWORD_WORD_BEFORE_SEP, TT.KW, { pop: true }),
   r(KEYWORD_WORD_BEFORE_WS, TT.KW),
   ...base
+];
+
+states.keyword_invocation_no_continue = [
+  RULE_NOT_ELLIPSIS_POP,
+  ...states.keyword_invocation
 ];
 
 /** curious rule for the variables table */

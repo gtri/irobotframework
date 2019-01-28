@@ -16,3 +16,4 @@ lib/
 node_modules/
 Untitled*.ipynb
 atest/fixtures/highlighting/samples/rfug/
+.hypothesis/
