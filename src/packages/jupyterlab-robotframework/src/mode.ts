@@ -61,6 +61,7 @@ export enum TT {
   SH = 'string.header',
   SS = 'string.strong',
   SSE = 'string.strong.em',
+  S2 = 'string-2',
   ST = 'string',
   TG = 'tag',
   V2 = 'variable-2'
@@ -407,7 +408,7 @@ const KEYWORD_WORD_BEFORE_WS = /([^\n\$\s*=\|]+?(?= ))/i;
 
 states.keyword_def = [
   RULE_VAR_START,
-  r(/\}(?=$)/, TT.V2),
+  RULE_LINE_ENDS_WITH_VAR,
   RULE_VAR_END,
   r(/ /, null),
   r(KEYWORD_WORD_BEFORE_VAR, TT.DF),
@@ -528,12 +529,14 @@ states.variable = [
   r(VAR_BUILTIN, TT.BI),
   RULE_NUM,
   r(VAR_OP, TT.OP),
+  r(/(:)(.*?[^\\])(?=\}\s*$)/, [TT.OP, TT.S2], { pop: true }),
+  r(/(:)(.*?[^\\])(?=\})/, [TT.OP, TT.S2]),
   r(/\./, TT.OP, { push: 'variable_property' }),
   r(/\[/, TT.BK, { next: 'variable_index' }),
   r(/\}(?=\[)/, TT.V2),
   r(/(?=\}\s*$)/, null, { pop: true }),
   r(/\}/, TT.V2, { pop: true }),
-  r(/[^\{\}\n]/, TT.V2)
+  r(/[^\{\}\n:]/, TT.V2)
 ];
 
 /** rules for extended syntax in a variable reference */
