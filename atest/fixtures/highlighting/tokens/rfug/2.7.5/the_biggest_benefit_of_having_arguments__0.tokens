@@ -56,8 +56,8 @@ def
 variable-2
 number
 variable-2
-def
-def
+keyword
+keyword
 variable-2
 number
 variable-2
@@ -77,9 +77,9 @@ def
 def
 variable-2
 variable-2
-def
-string
-string
+operator
+keyword
+keyword
 keyword
 keyword
 keyword

@@ -46,8 +46,8 @@ def
 def
 variable-2
 variable-2
-def
-string
+operator
+keyword
 variable-2
 keyword
 keyword
