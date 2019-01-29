@@ -2,6 +2,8 @@ name: irobotframework-dev
 
 variables:
   NEXT_RELEASE: 0.5.0
+  EXTENSIONS: >
+    @jupyter-widgets/jupyterlab-manager
 
 commands:
   atom:
@@ -63,6 +65,10 @@ commands:
     description: rebuild JupyterLab
     unix: jupyter lab build --dev
     env_spec: default
+  lab:ext:
+    description: install 3rd party extensions
+    unix: jupyter labextension install $EXTENSIONS --no-build
+    env_spec: hack
   ipython:
     unix: ipython --kernel-name robotframework
     env_spec: default
@@ -158,3 +164,9 @@ env_specs:
       - sphinx-autobuild
       - pip:
           - robotframeworklexer
+  hack:
+    inherit_from:
+      - test
+      - docs
+    packages:
+      - ipywidgets

@@ -9,6 +9,7 @@ ROOT = Path(__file__).parent.parent
 SRC = ROOT / "src"
 SCRIPTS = ROOT / "scripts"
 DOCS = ROOT / "docs"
+TOOLS = ROOT / "atest" / "tools"
 DIST = ROOT / "dist"
 VENDOR = ROOT / "vendor"
 FIXTURES = ROOT / "atest" / "fixtures"
