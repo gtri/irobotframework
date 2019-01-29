@@ -12,6 +12,8 @@ variable-2
 atom
 string
 string
+string
+keyword
 keyword
 keyword
 keyword
@@ -19,9 +21,6 @@ string
 variable-2
 string
 operator
-string
-string
-string
 string
 variable-2
 operator
