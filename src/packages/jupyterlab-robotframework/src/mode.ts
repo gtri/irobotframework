@@ -239,8 +239,17 @@ const base = [
   r(/#.*$/, TT.CM),
   r(/\\ +/, TT.BK),
   r(/\\(?=$)/, TT.BK),
-  r(/(=!<>+\-*\/%)*=/, TT.OP),
-  r(/([^\s=]*)(=)/, [TT.AT, TT.OP]),
+  r(
+    // a non-variable argument fragment before a variable before an equal
+    /([^\s\$@&%=]((?!\t+|\s+\|\s+|  +)([^=]|\\=))*?)(?=[$@&%].*?[^ =\\]=($|  |[^=]|\s+\||\t))/,
+    TT.AT
+  ),
+  r(
+    // a non-variable argument fragment before an equal
+    /([^\s\$@&%=]((?!\t+|\s+\|\s+|  +)([^=]|\\=))*?)(?==($|  |[^=]|\s+\||\t))/,
+    TT.AT
+  ),
+  r(/(=!<>+\-*\/%)*==?/, TT.OP),
   r(/_\*.*?\*_/, TT.SSE),
   r(/\*.*?\*/, TT.SS),
   r(/\_.*?\_/, TT.SE),
