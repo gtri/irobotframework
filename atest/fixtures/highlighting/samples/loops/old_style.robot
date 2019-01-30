@@ -4,12 +4,12 @@ This is a ${woo} keyword
 
 Old Syntax
     Log    Outside loop
-:FOR    ${animal}    IN    cat    dog
+    :FOR    ${i}  ${animal}    IN ENUMERATE   cat    dog
     \    Log    ${animal}
-    \    Log    2nd keyword   sds  ${asdasda}
+    \    Log    2nd keyword   a ${x.y}[0][${1}] b=${c${d}}  another
+    \    Log    something
     \    ${x} =  Log  ${animal}
     Log    Outside loop
-    Log    outside
 
 This is a keyword
     Log  and it's ${var} normal
