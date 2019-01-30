@@ -16,6 +16,7 @@ Robot Syntax is Beautiful
     [Documentation]    Does CodeMirror syntax highlighting work as expected?
     [Template]    Robot Syntax Highlighting Should Yield Tokens
     basic${/}00_test_case
+    loops${/}old_style
     # BEGIN RFUG
     rfug${/}2.1.3${/}in_the_space_separated_format_two__0
     rfug${/}2.1.3${/}one_file_can_contain_both_space__0
