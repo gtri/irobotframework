@@ -4,6 +4,7 @@
 import re
 import sys
 import subprocess
+from hashlib import sha256
 
 from lxml import html
 
@@ -26,41 +27,27 @@ def is_robot_src(el):
     )
 
 
-def build_tree():
+def build_hashes():
     ug = html.parse(str(UG_DOC))
 
-    els = [el for el in ug.xpath("//*[@class='highlight']") if is_robot_src(el)]
-
-    tree = {}
-
-    for el in els:
-        pel = el.xpath("preceding::*[self::p]")[-1]
-        h3 = el.xpath("preceding::*[self::h3]")[-1]
-        slug = re.sub(
-            r"[^a-z0-9]", "_", "_".join(pel.text_content().lower().split(" ")[0:6])
-        )
-        tree.setdefault(h3.text_content().split("\xa0")[0], {}).setdefault(
-            slug, []
-        ).append(el.text_content())
-
-    return tree
+    return {
+        sha256(el.text_content().encode("utf-8")).hexdigest(): el.text_content()
+        for el in
+        [el for el in ug.xpath("//*[@class='highlight']") if is_robot_src(el)]
+    }
 
 
-def write_fixtures(tree):
+def write_fixtures(hashes):
     robot_lines = []
 
-    for section, slugs in tree.items():
-        section_dir = FIXTURES / "highlighting" / "samples" / "rfug" / section
-        section_dir.mkdir(exist_ok=True, parents=True)
-        for slug, contents in slugs.items():
-            for i, content in enumerate(contents):
-                out_file = section_dir / f"{slug}__{i}.robot"
-                out_file.write_text(content)
-                robot_lines += [
-                    str(out_file.relative_to(section_dir.parent.parent))
-                    .replace(".robot", "")
-                    .replace("/", "${/}")
-                ]
+    for sha, txt in sorted(hashes.items()):
+        out_file = FIXTURES / "highlighting" / "samples" / "rfug" / f"{sha}.robot"
+        out_file.write_text(txt)
+        robot_lines += [
+            str(out_file.relative_to(out_file.parent.parent))
+            .replace(".robot", "")
+            .replace("/", "${/}")
+        ]
 
     return robot_lines
 
@@ -70,8 +57,8 @@ def rfug_fixtures():
         subprocess.check_call(["git", "submodule", "update", "--init"], cwd=str(ROOT))
     subprocess.check_call(["python", "ug2html.py", "create"], cwd=str(UG))
 
-    tree = build_tree()
-    lines = write_fixtures(tree)
+    hashes = build_hashes()
+    lines = write_fixtures(hashes)
     print("\n".join(lines))
 
     return 0
