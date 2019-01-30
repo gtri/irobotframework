@@ -32,8 +32,7 @@ def build_hashes():
 
     return {
         sha256(el.text_content().encode("utf-8")).hexdigest(): el.text_content()
-        for el in
-        [el for el in ug.xpath("//*[@class='highlight']") if is_robot_src(el)]
+        for el in [el for el in ug.xpath("//*[@class='highlight']") if is_robot_src(el)]
     }
 
 

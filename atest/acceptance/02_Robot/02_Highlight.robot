@@ -161,7 +161,7 @@ Robot Syntax Highlighting Should Yield Tokens
     Run Keyword And Ignore Error    Click Element    css:.jp-Dialog-button.jp-mod-accept
     ${robot} =    Get File    ..${/}fixtures${/}highlighting${/}samples${/}${example}.robot
     Add a Cell    ${robot}
-    Run Keyword And Ignore Error    Click Element  ${SAVE}
+    Run Keyword And Ignore Error    Click Element    ${SAVE}
     ${observed} =    Get Cell Source Tokens
     ${cake} =    Evaluate    "\\n".join([" ".join(obs) for obs in ${observed}])
     Create File    ${OUTPUT DIR}${/}${BROWSER}${/}tokens${/}${example}.tokens    ${cake}
