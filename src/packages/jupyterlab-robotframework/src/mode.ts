@@ -487,6 +487,7 @@ const RULE_CASE_SETTING_SIMPLE_PIPE = r(
 /** rules for data rows inside test/task definition */
 states.test_cases = [
   ...RULES_TABLE,
+  RULE_WS_LINE,
   RULE_ELLIPSIS,
   RULE_TAGS,
   RULE_SETTING_KEYWORD,
@@ -502,7 +503,6 @@ states.test_cases = [
   r(/(\| +)([^\|\s].+?)(\s*)( \| )/, [TT.BK, TT.SH, null, TT.BK], {
     sol: true
   }),
-  RULE_WS_LINE,
   ...base
 ];
 
