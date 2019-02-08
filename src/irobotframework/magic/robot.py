@@ -2,16 +2,14 @@
 # Distributed under the terms of the BSD-3-Clause License
 
 import re
-from typing import Text, Callable
+from typing import Callable, Text
 
+from ipykernel.ipkernel import IPythonKernel
+from IPython import get_ipython
 from tornado.concurrent import Future
 
-from IPython import get_ipython
-from ipykernel.ipkernel import IPythonKernel
-
-from ..irobot import StringTidy
 from .. import patches
-
+from ..irobot import StringTidy
 
 __all__ = ["register_robot_cell_magic", "default_robot_cell_magics"]
 

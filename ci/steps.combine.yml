@@ -1,0 +1,47 @@
+steps:
+  - task: DownloadPipelineArtifact@0
+    condition: always()
+    inputs:
+      artifactName: Linux headlessfirefox 36
+      targetPath: _testoutput/robot
+
+  - task: DownloadPipelineArtifact@0
+    condition: always()
+    inputs:
+      artifactName: Linux headlesschrome 37
+      targetPath: _testoutput/robot
+
+  - task: DownloadPipelineArtifact@0
+    condition: always()
+    inputs:
+      artifactName: MacOSX headlessfirefox 36
+      targetPath: _testoutput/robot
+
+  - task: DownloadPipelineArtifact@0
+    condition: always()
+    inputs:
+      artifactName: MacOSX headlesschrome 37
+      targetPath: _testoutput/robot
+
+  - task: DownloadPipelineArtifact@0
+    condition: always()
+    inputs:
+      artifactName: Windows headlessfirefox 36
+      targetPath: _testoutput/robot
+
+  - task: DownloadPipelineArtifact@0
+    condition: always()
+    inputs:
+      artifactName: Windows headlesschrome 37
+      targetPath: _testoutput/robot
+
+  - script: python -m scripts.test combine
+    condition: always()
+    displayName: Rebot
+
+  - task: PublishBuildArtifacts@1
+    condition: always()
+    displayName: Publish Robot Output
+    inputs:
+      pathtoPublish: _testoutput
+      artifactName: Robot Logs

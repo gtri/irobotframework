@@ -1,15 +1,18 @@
 # Copyright (c) 2018 Georgia Tech Research Corporation
 # Distributed under the terms of the BSD-3-Clause License
 
-from pathlib import Path
-from unittest.mock import patch
+import platform
 import subprocess
 import sys
+from pathlib import Path
+from unittest.mock import patch
 
 import jupyter_kernel_test
 
-from . import RobotBase, IPythonMagicBase
+from . import IPythonMagicBase, RobotBase
 from .utils import fake_validate
+
+PLATFORM = platform.system().lower()
 
 KERNELS = Path(sys.prefix) / "share" / "jupyter" / "kernels"
 
@@ -59,6 +62,9 @@ class ReportTests(ServerBase, RobotBase, jupyter_kernel_test.KernelTests):
     def test_irobotframework_report_image(self):
         """ does the image reporter work?
         """
+        if PLATFORM == "windows":
+            return
+
         with patch("jupyter_kernel_test.validate_message", fake_validate):
             reply, outputs = self.execute_helper(code=IMAGE_TASK, timeout=60)
             assert reply["content"]["status"] == "ok"
@@ -117,6 +123,9 @@ class MagicReportTests(ServerBase, IPythonMagicBase, jupyter_kernel_test.KernelT
     def test_ipython_robot_report_image(self):
         """ does the image reporter work?
         """
+        if PLATFORM == "windows":
+            return
+
         self.activate_magic()
 
         with patch("jupyter_kernel_test.validate_message", fake_validate):

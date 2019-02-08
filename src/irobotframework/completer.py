@@ -3,26 +3,21 @@
 
 """ Completion and Inspection for Robot Framework Keywords
 """
-from typing import List, Callable
 import re
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
-from traitlets.config import LoggingConfigurable
+from typing import Callable, List
 
 from IPython import get_ipython
-
-from robot.utils.robotpath import find_file
-
 from robot.libdocpkg import LibraryDocumentation
-from robot.libdocpkg.htmlwriter import JsonConverter, DocFormatter
-
+from robot.libdocpkg.htmlwriter import DocFormatter, JsonConverter
 from robot.parsing.datarow import DataRow
 from robot.parsing.robotreader import RobotReader
+from robot.utils.robotpath import find_file
+from traitlets.config import LoggingConfigurable
 
-from .doc_template import LIB_TEMPLATE, KW_TEMPLATE, DOC_CONTEXT
+from .doc_template import DOC_CONTEXT, KW_TEMPLATE, LIB_TEMPLATE
 from .util import find_line
-
 
 SKIP_LIBS = ["Remote"]
 RE_IMPORT = r"^\|?\s*(library|resource) ( +|\|)\s*([^ \n]+)"

@@ -3,8 +3,8 @@
 > _Interactive Acceptance Test-Driven Development and Robot Process Automation,
 > powered by [IPython](http://ipython.org) and [Robot Framework](https://robotframework.org)_
 
-
 irobotframework is a Jupyter Kernel that provides provides Robot Framework:
+
 - test **execution** with **rich output** from Robot notebooks
   - ...and IPython with `%%robot`
 - code **completion** and **inspection** in notebooks and consoles
@@ -13,30 +13,25 @@ irobotframework is a Jupyter Kernel that provides provides Robot Framework:
 
 Learn more in the documentation:
 
-| Interactive | HTML | Notebooks | GitHub |
-|-|-|-|-|
-| [Binder](https://mybinder.org/v2/gh/gtri/irobotframework/master?urlpath=lab%2Ftree%2Fdocs%2Findex.ipynb) | [readthedocs](https://irobotframework.readthedocs.org) | [nbviewer](https://github.com/gtri/irobotframework/docs/index.ipynb) | [GitHub](https://github.com/gtri/irobotframework/docs/index.ipynb)
-
+| Interactive                                                                                              | HTML                                                   | Notebooks                                                            | GitHub                                                             |
+| -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [Binder](https://mybinder.org/v2/gh/gtri/irobotframework/master?urlpath=lab%2Ftree%2Fdocs%2Findex.ipynb) | [readthedocs](https://irobotframework.readthedocs.org) | [nbviewer](https://github.com/gtri/irobotframework/docs/index.ipynb) | [GitHub](https://github.com/gtri/irobotframework/docs/index.ipynb) |
 
 ## Features
 
-| Feature | Screenshot |
-|---------|------------|
-| _Launch Robot Framework as a Notebook, Console or edit Robot files_ | [![][screenshot_launcher]][screenshot_launcher]
-| _Get rich completion of Robot language features, Libraries, Keywords and Variables_ | [![][screenshot_complete]][screenshot_complete]
-| _Inspect Libraries and Keywords... even ones you're writing_ | [![][screenshot_inspect]][screenshot_inspect]
-| _Work with Robot in IPython as an extension_ | [![][screenshot_magic]][screenshot_magic]
-| _Use Console and Rich display_ | [![][screenshot_console]][screenshot_console]
-
-
-
+| Feature                                                                             | Screenshot                                      |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------- |
+| _Launch Robot Framework as a Notebook, Console or edit Robot files_                 | [![][screenshot_launcher]][screenshot_launcher] |
+| _Get rich completion of Robot language features, Libraries, Keywords and Variables_ | [![][screenshot_complete]][screenshot_complete] |
+| _Inspect Libraries and Keywords... even ones you're writing_                        | [![][screenshot_inspect]][screenshot_inspect]   |
+| _Work with Robot in IPython as an extension_                                        | [![][screenshot_magic]][screenshot_magic]       |
+| _Use Console and Rich display_                                                      | [![][screenshot_console]][screenshot_console]   |
 
 [screenshot_complete]: ./docs/_static/screenshots/screenshot_complete.png
 [screenshot_console]: ./docs/_static/screenshots/screenshot_console.png
 [screenshot_inspect]: ./docs/_static/screenshots/screenshot_inspect.png
 [screenshot_launcher]: ./docs/_static/screenshots/screenshot_launcher.png
 [screenshot_magic]: ./docs/_static/screenshots/screenshot_magic.png
-
 
 ## Install
 
@@ -62,17 +57,20 @@ anaconda-project run bootstrap
 ```
 
 Now launch JupyterLab
+
 ```bash
 anaconda-project run lab
 ```
 
 Live develop by running the following in two prompts:
+
 ```bash
 anaconda-project run jlpm watch
 anaconda-project run lab --watch
 ```
+
 > Note: Python changes require a kernel restart, TypeScript changes require a
-  browser reload
+> browser reload
 
 ## Free Software
 

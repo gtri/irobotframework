@@ -58,4 +58,4 @@ Completions Should Contain
     [Documentation]   Does the completer show the expected completions?
     [Arguments]  @{completions}
     :FOR   ${c}   IN  @{completions}
-    \   Page Should Contain Element    ${COMPLETE_CSS}\[data-value="${c}"]
+    \   Wait Until Page Contains Element    ${COMPLETE_CSS}\[data-value="${c}"]

@@ -9,28 +9,28 @@
 """
 import json
 import re
-from pathlib import Path
-from collections import OrderedDict
 import uuid
-from typing import List, Text, Dict
+from collections import OrderedDict
+from pathlib import Path
+from typing import Dict, List, Text
 
 from ipykernel.ipkernel import IPythonKernel
 from ipykernel.kernelapp import IPKernelApp
 
+from . import docs, util
 from ._version import __version__
-from . import util, docs
-from .runner import KernelRunner
-from .reporter import KernelReporter
 from .completer import Completer
 from .completion_finders import get_default_completion_finders
-
 from .magic.robot import PY_MAGIC_RE, default_robot_cell_magics
-
+from .reporter import KernelReporter
+from .runner import KernelRunner
 
 __all__ = ["RobotKernel"]
 
 HERE = Path(__file__).parent.resolve()
-KERNEL_JSON = json.loads((HERE / "resources" / "kernel.json").read_text())
+KERNEL_JSON = json.loads(
+    (HERE / "resources" / "kernel.json").read_text(encoding="utf-8")
+)
 LANGUAGE_INFO = {
     **{k: v for k, v in KERNEL_JSON.items() if k not in ["argv"]},
     "version": __version__,
@@ -123,6 +123,10 @@ class RobotKernel(IPythonKernel):
         magic_response = None
         magicked = False
 
+        self.execution_count += 1
+
+        reply = dict(execution_count=self.execution_count)
+
         try:
             for magic_def in self.robot_magics["cell"].values():
                 pattern = magic_def["pattern"]
@@ -141,13 +145,12 @@ class RobotKernel(IPythonKernel):
 
             if magicked:
                 if isinstance(magic_response, dict):
-                    if "execution_count" not in magic_response:
-                        magic_response["execution_count"] = self.execution_count
                     if "user_expressions" not in magic_response:
                         magic_response[
                             "user_expressions"
                         ] = self.shell.user_expressions(user_expressions or {})
-                    return magic_response
+                    reply.update(magic_response)
+                    return reply
 
                 if isinstance(magic_response, str):
                     code = magic_response
@@ -162,6 +165,7 @@ class RobotKernel(IPythonKernel):
         # pylint: disable=W0703
         except Exception as err:
             err_spec = util.format_error(err)
+
             if not silent:
                 self.send_response(self.iopub_socket, "error", err_spec)
             return dict(status="error", **err_spec)
@@ -173,10 +177,9 @@ class RobotKernel(IPythonKernel):
         if runner.suite.tests:
             # actually run!
             runner.run()
-            self.execution_count += 1
-            reply = KernelReporter(runner, silent=silent).report()
+            reply.update(KernelReporter(runner, silent=silent).report())
         else:
-            reply = dict(status="ok", execution_count=self.execution_count)
+            reply.update(status="ok")
 
         self.completer.imports = runner.imports
 
@@ -184,11 +187,9 @@ class RobotKernel(IPythonKernel):
         if reply["status"] == "ok":
             self.robot_history[cell_id] = code
             reply.update(
-                execution_count=self.execution_count,
                 payload=[],
                 user_expressions=self.shell.user_expressions(user_expressions or {}),
             )
-
         return reply
 
     def do_complete(self, code: Text, cursor_pos: int) -> Dict:

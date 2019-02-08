@@ -1,0 +1,12 @@
+jobs:
+  - job: Combine
+    condition: always()
+    pool:
+      vmImage: ubuntu-16.04
+    dependsOn:
+      - Acceptance_Linux
+      - Acceptance_MacOSX
+      - Acceptance_Windows
+    steps:
+      - template: steps.conda.combine.yml
+      - template: steps.combine.yml

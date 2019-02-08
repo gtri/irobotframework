@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation     Try out the python magics
-Suite Setup       Set Screenshot Directory    ${OUTPUT_DIR}/${BROWSER}/python
-Default Tags      kernel:python    browser:${BROWSER}
+Suite Setup       Set Screenshot Directory    ${OUTPUT_DIR}${/}python
+Default Tags      kernel:python    browser:${BROWSER}    py:${PY}
 Resource          ../resources/Lab.robot
 Resource          ../resources/Browser.robot
 Resource          ../resources/Notebook.robot

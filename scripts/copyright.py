@@ -4,7 +4,7 @@
 import re
 import sys
 
-from . import SRC, YEAR, COPYRIGHT_RE, PY_HEADER, WEB_HEADER, SCRIPTS, DOCS
+from . import COPYRIGHT_RE, DOCS, PY_HEADER, SCRIPTS, SRC, WEB_HEADER, YEAR
 
 
 def update_patterns(root, patterns, header, ignores=None) -> int:
@@ -26,7 +26,7 @@ def update_patterns(root, patterns, header, ignores=None) -> int:
             if ignored:
                 continue
 
-            txt = path.read_text()
+            txt = path.read_text(encoding="utf-8")
 
             years = re.findall(COPYRIGHT_RE, txt)
 

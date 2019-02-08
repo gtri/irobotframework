@@ -17,7 +17,7 @@ Capture ${criteria} Robot "${document}" Screenshot
     [Documentation]   Verify that documents are clickable and contain expected content
     ${xpath} =  Set Variable  //a[text() = '${document}']
     ${title} =  Set Variable  Untitled Test Suite ${document}
-    Wait Until Page Contains Element    ${xpath}
+    Wait Until Page Contains Element    ${xpath}  timeout=20s
     Click Element    ${xpath}
     Sleep    1s
     Select Window   NEW

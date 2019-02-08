@@ -1,0 +1,13 @@
+steps:
+  - task: CondaEnvironment@1
+    inputs:
+      createOptions: -c defaults -c conda-forge
+      createCustomEnvironment: true
+      updateConda: false
+      environmentName: _buildpy
+      packageSpecs: >
+        black
+        flake8
+        isort
+        python>=3.7,<3.8
+        robotframework-lint

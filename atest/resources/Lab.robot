@@ -10,7 +10,9 @@ Resource          Commands.robot
 *** Variables ***
 ${TOKEN}          hopelesslyinsecure
 ${LAB_CMD}        jupyter-lab --no-browser --NotebookApp.token=${TOKEN} --port 18888 --debug --ip=0.0.0.0
-${LAB_URL}        http://localhost:18888/lab?token=${TOKEN}
+${BASE_URL}        http://localhost:18888
+${LAB_URL}        ${BASE_URL}/lab?token=${TOKEN}
+${TREE_URL}       ${BASE_URL}/tree?token=${TOKEN}
 
 *** Keywords ***
 Wait for Splash Screen
@@ -29,8 +31,8 @@ Launch a new
 
 Start JupyterLab
     [Documentation]    Start a Jupyter Notebook Server with JupyterLab
-    ${notebooks} =  Set Variable  ${OUTPUT_DIR}${/}${BROWSER}${/}_notebooks
-    ${log} =  Set Variable  ${OUTPUT_DIR}${/}${BROWSER}${/}_lab.log
+    ${notebooks} =  Set Variable  ${OUTPUT_DIR}${/}_notebooks
+    ${log} =  Set Variable  ${OUTPUT_DIR}${/}_lab.log
     ${cmd} =  Set Variable  ${LAB_CMD} --notebook-dir=${notebooks}
     Create Directory      ${notebooks}
     Start Process    ${cmd}    shell=true    stderr=STDOUT    stdout=${log}
@@ -65,6 +67,9 @@ Reset Application State and Close
 
 Clean Up JupyterLab
     [Documentation]    Close all the browsers and stop all processes
+    Open JupyterLab with  ${BROWSER}
+    Go to  ${TREE_URL}
+    Click Element  css:#shutdown
     Close All Browsers
     Terminate All Processes    kill=True
 
