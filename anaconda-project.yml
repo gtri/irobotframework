@@ -122,6 +122,7 @@ env_specs:
       - nodejs >=8.12,<9
       - pillow
       - robotframework >=3.1
+      - tornado <6
   test:
     description: an even-heavier test environment, because browsers
     inherit_from:
