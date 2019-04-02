@@ -16,7 +16,7 @@ Add a Cell
     [Documentation]   Add a cell (probably code) with the given source
     [Arguments]    ${code}
     Click Element    css:${VISIBLE_NOTEBOOK} .jp-NotebookPanel-toolbar .jp-AddIcon
-    Sleep    0.1s
+    Wait Until Page Contains Element  css:${VISIBLE_NOTEBOOK} ${CELL_CSS}
     Click Element    css:${VISIBLE_NOTEBOOK} ${CELL_CSS}
     Set Cell Source    ${code}
 

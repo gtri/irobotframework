@@ -2,6 +2,8 @@ name: irobotframework-dev
 
 variables:
   NEXT_RELEASE: 0.5.0
+  EXTENSIONS: >
+    @jupyter-widgets/jupyterlab-manager
 
 commands:
   atom:
@@ -48,6 +50,9 @@ commands:
       && cd src/packages/jupyterlab-robotframework \
       && mv $(npm pack) ../../../dist/npm/
     env_spec: test
+  build:rfug:
+    unix: python -m scripts.rfug
+    env_spec: docs
   jlpm:
     description: run the yarn bundled with JupyterLab
     unix: jlpm
@@ -60,6 +65,10 @@ commands:
     description: rebuild JupyterLab
     unix: jupyter lab build --dev
     env_spec: default
+  lab:ext:
+    description: install 3rd party extensions
+    unix: jupyter labextension install $EXTENSIONS --no-build
+    env_spec: hack
   ipython:
     unix: ipython --kernel-name robotframework
     env_spec: default
@@ -67,9 +76,13 @@ commands:
     unix: mkdir -p _testoutput && cd _testoutput && pytest
     env_spec: test
   test:robot:
-    unix: set -eux \
-      && cd atest/acceptance \
-      && python -m robot -d ../../_testoutput --xunit junit_robot.xml .
+    unix: |-
+      set -eux \
+        && cd atest/acceptance \
+        && python -m robot \
+          -d ../../_testoutput \
+          --xunit junit_robot.xml \
+          .
     env_spec: test
   test:release:
     unix: python -m scripts.release_check ${NEXT_RELEASE}
@@ -79,14 +92,15 @@ commands:
       set -eux \
       && python -m scripts.nblint \
       && python -m scripts.copyright \
-      && python -m robot.tidy -r atest \
+      && python -m robot.tidy -r atest/resources \
+      && python -m robot.tidy -r atest/acceptance \
       && rflint \
         --configure TooManyTestSteps:20 \
         --configure TooFewKeywordSteps:0 \
         --configure LineTooLong:200 \
-        atest/**/*.robot \
+        -r atest/{acceptance,resources}/*.robot \
       && black --line-length 88 setup.py ./src/irobotframework/ scripts docs \
-      && flake8 --max-line-length=88 \
+      && flake8 --max-line-length=88 scripts src/irobotframework setup.py docs \
       && jlpm lint
     env_spec: test
   release:pypi:
@@ -131,6 +145,7 @@ env_specs:
       - black
       - flake8
       - geckodriver
+      - hypothesis
       - jupyter_kernel_test
       - pylint
       - pytest
@@ -144,6 +159,15 @@ env_specs:
       - default
     packages:
       - nbsphinx
+      - lxml
       - sphinx
       - sphinx_rtd_theme
       - sphinx-autobuild
+      - pip:
+          - robotframeworklexer
+  hack:
+    inherit_from:
+      - test
+      - docs
+    packages:
+      - ipywidgets

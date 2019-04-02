@@ -1,0 +1,3 @@
+[submodule "vendor/robotframework"]
+	path = vendor/robotframework
+	url = https://github.com/robotframework/robotframework.git
