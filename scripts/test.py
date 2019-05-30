@@ -8,8 +8,6 @@ from pathlib import Path
 from subprocess import check_call
 from tempfile import TemporaryDirectory
 
-import robot
-
 from . import DIST, PLATFORM, PY, TEST_DIR, TEST_OUT, run
 
 BROWSER = os.environ.get("BROWSER", "headlessfirefox")
@@ -94,7 +92,13 @@ def unit(pytest_args):
 
 
 def acceptance(robot_args):
-    import chromedriver_binary  # noqa
+    import robot
+
+    try:
+        import chromedriver_binary
+    except ImportError:
+        print("couldn't import chromedriver")
+        chromedriver_binary = None
 
     global BROWSER
 
@@ -111,7 +115,9 @@ def acceptance(robot_args):
             os.environ["BROWSER"] = BROWSER
 
         os.environ.update(
-            PATH=os.pathsep.join(
+            PATH=os.environ["path"]
+            if chromedriver_binary is None
+            else os.pathsep.join(
                 [os.path.dirname(chromedriver_binary.__file__), os.environ["PATH"]]
             ),
             JUPYTERLAB_DIR=str(tdp / "lab"),
