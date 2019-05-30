@@ -8,6 +8,8 @@ from pathlib import Path
 from subprocess import check_call
 from tempfile import TemporaryDirectory
 
+import robot
+
 from . import DIST, PLATFORM, PY, TEST_DIR, TEST_OUT, run
 
 BROWSER = os.environ.get("BROWSER", "headlessfirefox")
@@ -109,7 +111,7 @@ def acceptance(robot_args):
             robot_args.remove(BROWSER)
             os.environ["BROWSER"] = BROWSER
 
-        env.update(
+        os.environ.update(
             PATH=os.pathsep.join(
                 [os.path.dirname(chromedriver_binary.__file__), os.environ["PATH"]]
             ),
@@ -125,9 +127,6 @@ def acceptance(robot_args):
 
         args = (
             [
-                sys.executable,
-                "-m",
-                "robot",
                 "--name",
                 f"{BROWSER} on {PLATFORM} on {PY}",
                 "--outputdir",
@@ -154,7 +153,8 @@ def acceptance(robot_args):
             + list(robot_args)
             + [str(TEST_DIR)]
         )
-        return run(args, env=env)
+        robot.run_cli(args)
+
 
 
 def combine(rebot_args):

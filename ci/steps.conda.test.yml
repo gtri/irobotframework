@@ -19,7 +19,7 @@ steps:
           pillow
           pytest-cov
           python$(PY_SPEC)
-          robotframework>=3.1
+          robotframework>=3.1.2
   - ${{ if eq(parameters.name, 'Windows') }}:
     - task: CondaEnvironment@1
       condition: eq(variables['TEST_KIND'], 'acceptance')
@@ -38,10 +38,9 @@ steps:
           python$(PY_SPEC)
           python-chromedriver-binary>=73,<74
           robotframework-seleniumlibrary>=3.2.0
-          robotframework>=3.1
-          selenium>=3.141.0
+          robotframework>=3.1.2
 
-  - ${{ if not(eq(parameters.name, 'Windows')) }}:
+  - ${{ if eq(parameters.name, 'Linux') }}:
     - task: CondaEnvironment@1
       condition: eq(variables['TEST_KIND'], 'acceptance')
       inputs:
@@ -60,7 +59,6 @@ steps:
           python-chromedriver-binary>=73,<74
           robotframework-seleniumlibrary>=3.2.0
           robotframework>=3.1
-          selenium>=3.141.0
     - task: CondaEnvironment@1
       condition: eq(variables['TEST_KIND'], 'unit')
       inputs:
@@ -77,4 +75,41 @@ steps:
           pillow
           pytest-cov
           python$(PY_SPEC)
+          robotframework>=3.1.2
+
+  - ${{ if eq(parameters.name, 'MacOSX') }}:
+    - task: CondaEnvironment@1
+      condition: eq(variables['TEST_KIND'], 'acceptance')
+      inputs:
+        createOptions: -c defaults -c conda-forge
+        createCustomEnvironment: true
+        updateConda: false
+        environmentName: _accept$(PY_VERSION)
+        packageSpecs: >
+          geckodriver
+          importnb>=0.5.2
+          ipykernel>=5.1
+          ipython>=7.2
+          jupyterlab>=0.35.6,<0.36
+          pillow
+          python$(PY_SPEC)
+          python-chromedriver-binary>=74,<75
+          robotframework-seleniumlibrary>=3.2.0
           robotframework>=3.1
+    - task: CondaEnvironment@1
+      condition: eq(variables['TEST_KIND'], 'unit')
+      inputs:
+        createOptions: -c defaults -c conda-forge
+        createCustomEnvironment: true
+        updateConda: false
+        environmentName: _unit$(PY_VERSION)
+        packageSpecs: >
+          importnb>=0.5.2
+          ipykernel>=5.1
+          ipython>=7.2
+          jinja2
+          jupyter_kernel_test
+          pillow
+          pytest-cov
+          python$(PY_SPEC)
+          robotframework>=3.1.2
