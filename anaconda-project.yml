@@ -6,13 +6,10 @@ variables:
     @jupyter-widgets/jupyterlab-manager
 
 commands:
-  atom:
-    unix: atom .
-    env_spec: test
   bootstrap:
     unix: python -m scripts.bootstrap
     windows: python -m scripts.bootstrap
-    env_spec: test
+    env_spec: default
   build:docs:
     description: build the docs
     unix: sphinx-build docs dist/docs
@@ -49,6 +46,7 @@ commands:
   jlpm:
     description: run the yarn bundled with JupyterLab
     unix: jlpm
+    env_spec: default
   build:
     unix: python -m scripts.build
     windows: python -m scripts.build
@@ -77,18 +75,6 @@ commands:
     windows: ipython --kernel-name robotframework
     unix: ipython --kernel-name robotframework
     env_spec: default
-  test:py:
-    unix: mkdir -p _testoutput && cd _testoutput && pytest
-    env_spec: test
-  test:robot:
-    unix: |-
-      set -eux \
-        && cd atest/acceptance \
-        && python -m robot \
-          -d ../../_testoutput \
-          --xunit junit_robot.xml \
-          .
-    env_spec: test
   test:
     description: |
       run all the tests or specify [l]int, [u]nit, [a]cceptance, [c]ombine.
@@ -99,22 +85,6 @@ commands:
     env_spec: test
   test:release:
     unix: python -m scripts.release_check ${NEXT_RELEASE}
-    env_spec: test
-  test:lint:
-    unix: |-
-      set -eux \
-      && python -m scripts.nblint \
-      && python -m scripts.copyright \
-      && python -m robot.tidy -r atest/resources \
-      && python -m robot.tidy -r atest/acceptance \
-      && rflint \
-        --configure TooManyTestSteps:20 \
-        --configure TooFewKeywordSteps:0 \
-        --configure LineTooLong:200 \
-        -r atest/{acceptance,resources}/*.robot \
-      && black --line-length 88 setup.py ./src/irobotframework/ scripts docs \
-      && flake8 --max-line-length=88 scripts src/irobotframework setup.py docs \
-      && jlpm lint
     env_spec: test
   release:pypi:
     unix: |-
