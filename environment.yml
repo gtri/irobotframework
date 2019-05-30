@@ -1,4 +1,4 @@
-name: default
+name: irobotframework-minimal
 
 channels:
   - conda-forge

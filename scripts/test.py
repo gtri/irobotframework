@@ -153,8 +153,14 @@ def acceptance(robot_args):
             + list(robot_args)
             + [str(TEST_DIR)]
         )
-        robot.run_cli(args)
 
+        old_cwd = os.getcwd()
+
+        try:
+            os.chdir(TEST_DIR)
+            robot.run_cli(args)
+        finally:
+            os.chdir(old_cwd)
 
 
 def combine(rebot_args):

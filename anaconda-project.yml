@@ -71,7 +71,7 @@ commands:
   lab:ext:
     description: install 3rd party extensions
     unix: jupyter labextension install $EXTENSIONS --no-build
-    env_spec: hack
+    env_spec: default
   ipython:
     description: run IRobotFramework in the terminal
     windows: ipython --kernel-name robotframework
@@ -124,17 +124,12 @@ commands:
     env_spec: test
 
 env_specs:
-  _python:
-    packages:
-      - python >=3.6,<3.7
-  _build:
-    description: an environment for building conda packages (busted in CI, use base)
-    inherit_from:
-      - _python
-    packages:
-      - conda-build
-      - conda-verify
   default:
+    inherit_from:
+      - test
+    packages:
+      - ipywidgets
+  irobotframework-minimal:
     description: a pretty heavy environment, because robot & jupyter & node
     inherit_from:
       - _python
@@ -152,13 +147,13 @@ env_specs:
       - tornado <6
   default-win:
     inherit_from:
-      - default
+      - irobotframework-minimal
     packages:
       - nodejs>=8,<9
   test:
     description: an even-heavier test environment, because browsers
     inherit_from:
-      - default
+      - irobotframework-minimal
     packages:
       - black
       - flake8
@@ -175,17 +170,17 @@ env_specs:
       - twine
   test-win:
     inherit_from:
-      - default-win
+      - minimal-win
       - test
   test-win37:
     inherit_from:
-      - default-win
+      - minimal-win
       - test
     packages:
       - python>=3.7,<3.8
   docs:
     inherit_from:
-      - default
+      - irobotframework-minimal
     packages:
       - nbsphinx
       - lxml
@@ -193,10 +188,14 @@ env_specs:
       - sphinx_rtd_theme
       - sphinx-autobuild
       - pip:
-          - robotframeworklexer
-  hack:
-    inherit_from:
-      - test
-      - docs
+        - robotframeworklexer
+  _python:
     packages:
-      - ipywidgets
+      - python >=3.6,<3.7
+  _build:
+    description: an environment for building conda packages (busted in CI, use base)
+    inherit_from:
+      - _python
+    packages:
+      - conda-build
+      - conda-verify
