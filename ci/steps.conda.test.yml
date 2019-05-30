@@ -34,6 +34,7 @@ steps:
           ipykernel>=5.1
           ipython>=7.2
           jupyterlab>=0.35.6,<0.36
+          jupyter_server
           pillow
           python$(PY_SPEC)
           python-chromedriver-binary>=2.46,<73
