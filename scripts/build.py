@@ -11,6 +11,8 @@ from . import DIST, PACKAGE, ROOT, run
 
 
 def sdist(sdist_args):
+    """ Build the source distribution
+    """
     rc = run(["python", "setup.py", "clean"])
     if rc != 0:
         return rc
@@ -18,6 +20,8 @@ def sdist(sdist_args):
 
 
 def wheel(wheel_args):
+    """ Build the wheel
+    """
     rc = run(["python", "setup.py", "clean"])
     if rc != 0:
         return rc
@@ -27,10 +31,14 @@ def wheel(wheel_args):
 
 
 def lerna(lerna_args):
+    """ Build the lerna packages
+    """
     return run(["jlpm", "build"] + lerna_args)
 
 
 def npm(npm_args):
+    """ pack up the extensions
+    """
     src_dirs = sum([list(ROOT.glob(ws)) for ws in PACKAGE["workspaces"]], [])
     out_dir = DIST / "npm"
 
@@ -50,6 +58,8 @@ def npm(npm_args):
 
 
 def jupyterlab(extra_args):
+    """ build a jupyterlab
+    """
     with tempfile.TemporaryDirectory() as td:
         tdp = Path(td)
 
@@ -76,6 +86,8 @@ def jupyterlab(extra_args):
 
 
 def docs(extra_args):
+    """ build the docs
+    """
     try:
         import sphinx
 
