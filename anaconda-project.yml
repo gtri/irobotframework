@@ -4,6 +4,7 @@ variables:
   NEXT_RELEASE: 0.5.0
   EXTENSIONS: >
     @jupyter-widgets/jupyterlab-manager
+    ./dist/npm/jupyterlab-robotframework-0.5.0.tgz
 
 commands:
   bootstrap:
