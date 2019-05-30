@@ -8,13 +8,12 @@
 """ (Aspirationally) configurable outputs for interactive Robot Framework
     runs.
 """
-from base64 import b64encode
 import json
 import re
-
-from traitlets.config import LoggingConfigurable
+from base64 import b64encode
 
 from robot.reporting import ResultWriter
+from traitlets.config import LoggingConfigurable
 
 from . import util
 
@@ -80,9 +79,11 @@ def report_robot_error(reporter):
     """
     if reporter.runner.failed and not reporter.silent:
         kernel = reporter.runner.kernel
-        kernel.send_response(
-            kernel.iopub_socket, "error", clean_robot_error(reporter.runner.stdout)
+        err_spec = dict(
+            execution_count=reporter.runner.kernel.execution_count,
+            **clean_robot_error(reporter.runner.stdout)
         )
+        kernel.send_response(kernel.iopub_socket, "error", err_spec)
 
 
 def report_last_json(reporter):
@@ -104,7 +105,7 @@ def report_images(reporter):
     path = reporter.runner.path
 
     output_path = path / "output.xml"
-    xml = output_path.read_text()
+    xml = output_path.read_text(encoding="utf-8")
     images = [
         name for name in re.findall('img src="([^"]+)', xml) if (path / name).exists()
     ]

@@ -5,16 +5,17 @@
 """
 import argparse
 
-from IPython.core.magic import Magics, magics_class, cell_magic
 from IPython import get_ipython
+from IPython.core.magic import Magics, cell_magic, magics_class
+
+from ..reporter import KernelReporter
+from ..runner import KernelRunner
 
 try:
     from jinja2 import Template
 except ImportError:
     Template = None
 
-from ..runner import KernelRunner
-from ..reporter import KernelReporter
 
 # magic placeholder for default jinja value
 USER_NS = "<user_ns>"

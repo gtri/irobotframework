@@ -3,14 +3,10 @@
   "bugs": {
     "url": "https://github.com/gtri/irobotframework/issues"
   },
-  "dependencies": {
-    "@jupyterlab/application": "^0.19.1"
-  },
-  "peerDependencies": {
-    "codemirror": "~5.39.0"
-  },
   "description": "Write and run Robot Framework tests in JupyterLab",
   "devDependencies": {
+    "@jupyterlab/application": "^0.19.1",
+    "codemirror": "~5.39.0",
     "rimraf": "~2.6.2",
     "typescript": "~3.1.1"
   },
@@ -29,6 +25,10 @@
   "license": "BSD-3-Clause",
   "main": "lib/index.js",
   "name": "jupyterlab-robotframework",
+  "peerDependencies": {
+    "@jupyterlab/application": "^0.19.1",
+    "codemirror": "~5.39.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/gtri/irobotframework.git"

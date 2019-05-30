@@ -8,86 +8,43 @@ commands:
     unix: atom .
     env_spec: test
   bootstrap:
-    unix: |-
-      set -eux \
-      && pip install -e . --ignore-installed --no-deps --no-cache-dir \
-      && jupyter kernelspec install \
-        --name robotframework \
-        --sys-prefix \
-        src/irobotframework/resources \
-      && jupyter kernelspec list \
-      && jlpm bootstrap
+    unix: python -m scripts.bootstrap
+    windows: python -m scripts.bootstrap
     env_spec: default
-  build:docs:
-    description: build the docs
-    unix: sphinx-build docs dist/docs
-    env_spec: docs
-  build:docs:watch:
-    description: build the docs
-    unix: sphinx-autobuild -b html docs dist/docs
-    env_spec: docs
-  build:pip:sdist:
-    description: build a pip sdist
-    unix: |-
-      set -eux \
-      && python setup.py clean \
-      && python setup.py sdist --dist-dir ${PROJECT_DIR}/dist/pip
-    env_spec: test
-  build:pip:wheel:
-    description: build a pip wheel
-    unix: |-
-      set -eux \
-      && python setup.py clean \
-      && python setup.py bdist_wheel --dist-dir ${PROJECT_DIR}/dist/pip
-    env_spec: test
-  build:npm:
-    description: build an npm package
-    unix: |-
-      set -eux \
-      && mkdir -p dist/npm \
-      && cd src/packages/jupyterlab-robotframework \
-      && mv $(npm pack) ../../../dist/npm/
-    env_spec: test
-  jlpm:
-    description: run the yarn bundled with JupyterLab
-    unix: jlpm
+  build:
+    unix: python -m scripts.build
+    windows: python -m scripts.build
     env_spec: default
+  watch:
+    description: watch the [d]ocs
+    unix: python -m scripts.watch
+    windows: python -m scripts.watch
+    env_spec: docs
   lab:
     description: run JupyterLab
     unix: jupyter lab --no-browser --debug
+    windows: jupyter lab --no-browser --debug
     env_spec: default
-  lab:build:
-    description: rebuild JupyterLab
-    unix: jupyter lab build --dev
+  lab:dist:
+    description: run JupyterLab in the built dist folder
+    unix: jupyter lab --no-browser --debug --app-dir dist/lab
+    windows: jupyter lab --no-browser --debug --app-dir dist\lab
     env_spec: default
   ipython:
+    description: run IRobotFramework in the terminal
+    windows: ipython --kernel-name robotframework
     unix: ipython --kernel-name robotframework
     env_spec: default
-  test:py:
-    unix: mkdir -p _testoutput && cd _testoutput && pytest
-    env_spec: test
-  test:robot:
-    unix: set -eux \
-      && cd atest/acceptance \
-      && python -m robot -d ../../_testoutput --xunit junit_robot.xml .
+  test:
+    description: |
+      run all the tests or specify [l]int, [u]nit, [a]cceptance, [c]ombine.
+      extra args passed to underlying scripts for unit, acceptance, and combine,
+      while lint accepts targets
+    unix: python -m scripts.test
+    windows: python -m scripts.test
     env_spec: test
   test:release:
     unix: python -m scripts.release_check ${NEXT_RELEASE}
-    env_spec: test
-  test:lint:
-    unix: |-
-      set -eux \
-      && python -m scripts.nblint \
-      && python -m scripts.copyright \
-      && python -m robot.tidy -r atest \
-      && rflint \
-        --configure TooManyTestSteps:20 \
-        --configure TooFewKeywordSteps:0 \
-        --configure LineTooLong:200 \
-        atest/**/*.robot \
-      && black --line-length 88 setup.py ./src/irobotframework/ scripts docs \
-      && flake8 --max-line-length=88 \
-      && jlpm lint
     env_spec: test
   release:pypi:
     unix: |-
@@ -119,10 +76,19 @@ env_specs:
       - ipykernel >=5.1
       - ipython >=7.2
       - jupyterlab >=0.35.4,<0.36
+      - jinja2
       - nodejs >=8.12,<9
       - pillow
       - robotframework >=3.1
+<<<<<<< HEAD
       - tornado <6
+=======
+  default-win:
+    inherit_from:
+      - default
+    packages:
+      - nodejs>=8,<9
+>>>>>>> bollwyvl/master
   test:
     description: an even-heavier test environment, because browsers
     inherit_from:
@@ -131,6 +97,7 @@ env_specs:
       - black
       - flake8
       - geckodriver
+      - isort
       - jupyter_kernel_test
       - pylint
       - pytest
@@ -139,6 +106,16 @@ env_specs:
       - robotframework-lint
       - robotframework-seleniumlibrary >=3.2.0
       - twine
+  test-win:
+    inherit_from:
+      - default-win
+      - test
+  test-win37:
+    inherit_from:
+      - default-win
+      - test
+    packages:
+      - python>=3.7,<3.8
   docs:
     inherit_from:
       - default
