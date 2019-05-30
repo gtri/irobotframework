@@ -5,13 +5,11 @@
 """
 
 from ._version import __version__  # noqa
-
-from .magic.robot import register_robot_cell_magic, unregister_robot_cell_magic
 from .completer import (
     register_robot_completion_finder,
     unregister_robot_completion_finder,
 )
-
+from .magic.robot import register_robot_cell_magic, unregister_robot_cell_magic
 
 __all__ = [
     "load_ipython_extension",

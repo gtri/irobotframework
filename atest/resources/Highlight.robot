@@ -10,6 +10,7 @@ Library           OperatingSystem
 
 *** Keywords ***
 Robot Syntax Highlighting Should Yield Tokens
+    [Documentation]  Makes sure some notebook highlighting tokens are correct
     [Arguments]    ${example}
     Run Keyword And Ignore Error    Click Element    css:.jp-Dialog-button.jp-mod-accept
     ${robot} =    Get File    ..${/}fixtures${/}highlighting${/}samples${/}${example}.robot

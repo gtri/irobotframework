@@ -4,7 +4,6 @@ Suite Setup       Make a Highlighting Notebook
 Default Tags      kernel:robot    browser:${BROWSER}    feature:highlighting
 Resource          ../../resources/Highlight.robot
 
-
 *** Test Cases ***
 Robot Syntax is Beautiful
     [Documentation]    Does CodeMirror syntax highlighting work as expected?
@@ -148,4 +147,3 @@ Robot Syntax is Beautiful
     rfug${/}fe8480f4197ffe02624f80c1f2d8c21e22c0b2e10fb7c8080240ff4dd21db486
     rfug${/}fee50dc83ea12e719f26789ebd9fdcc0e910b3bd36663f80133030c70500d54b
     # END RFUG
-

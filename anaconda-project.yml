@@ -12,7 +12,7 @@ commands:
   bootstrap:
     unix: python -m scripts.bootstrap
     windows: python -m scripts.bootstrap
-    env_spec: default
+    env_spec: test
   build:docs:
     description: build the docs
     unix: sphinx-build docs dist/docs
@@ -146,7 +146,6 @@ env_specs:
       - ipykernel >=5.1
       - ipython >=7.2
       - jupyterlab >=0.35.4,<0.36
-      - jinja2
       - nodejs >=8.12,<9
       - pillow
       - robotframework >=3.1
@@ -194,7 +193,7 @@ env_specs:
       - sphinx_rtd_theme
       - sphinx-autobuild
       - pip:
-        - robotframeworklexer
+          - robotframeworklexer
   hack:
     inherit_from:
       - test

@@ -2,14 +2,13 @@
 # Distributed under the terms of the BSD-3-Clause License
 
 import re
-import sys
 import subprocess
+import sys
 from hashlib import sha256
 
 from lxml import html
 
-from . import ROOT, VENDOR, FIXTURES
-
+from . import FIXTURES, ROOT, VENDOR
 
 ROBOT = VENDOR / "robotframework"
 UG = ROBOT / "doc" / "userguide"
