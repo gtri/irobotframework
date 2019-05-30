@@ -7,11 +7,10 @@
 
 """ Various dirty patches
 """
-import sys
-import types
-
 # from warnings import warn
 import asyncio
+import sys
+import types
 
 
 class ScopedCodeRunner(object):

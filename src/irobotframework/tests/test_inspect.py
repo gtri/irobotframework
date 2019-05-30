@@ -4,6 +4,7 @@
 """ Pure python tests of kernel behavior
 """
 import jupyter_kernel_test
+
 from . import RobotBase
 
 

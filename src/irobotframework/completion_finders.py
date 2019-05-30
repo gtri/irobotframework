@@ -6,8 +6,8 @@
 
 # pylint: disable=W0613,C0330,R0913,W0703,R0914
 
-from typing import List, Tuple
 import re
+from typing import List, Tuple
 
 from IPython.core.completerlib import get_root_modules
 from robot.libraries import STDLIBS

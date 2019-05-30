@@ -1,0 +1,13 @@
+jobs:
+  - job: Build_JS
+    pool:
+      vmImage: ubuntu-16.04
+    steps:
+      - template: steps.conda.build.js.yml
+      - template: steps.build.js.yml
+  - job: Build_Py
+    pool:
+      vmImage: ubuntu-16.04
+    steps:
+      - template: steps.conda.build.py.yml
+      - template: steps.build.py.yml

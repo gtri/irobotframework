@@ -1,0 +1,54 @@
+parameters:
+  name: Linux
+
+steps:
+  - task: DownloadPipelineArtifact@0
+    inputs:
+      artifactName: Py Dist
+      targetPath: dist
+
+  - task: DownloadPipelineArtifact@0
+    condition: eq(variables['TEST_KIND'], 'acceptance')
+    inputs:
+      artifactName: JS Dist
+      targetPath: dist
+
+  - script: python -m scripts.bootstrap sdist
+    condition: eq(variables['TEST_KIND'], 'acceptance')
+    displayName: Bootstrap Python
+
+  - script: python -m scripts.bootstrap wheel
+    condition: eq(variables['TEST_KIND'], 'unit')
+    displayName: Bootstrap Python
+
+  - script: python -m scripts.test acceptance --browser $(BROWSER)
+    condition: eq(variables['TEST_KIND'], 'acceptance')
+    displayName: Acceptance Tests
+
+  - script: python -m scripts.test unit
+    condition: eq(variables['TEST_KIND'], 'unit')
+    displayName: Unit Tests
+
+  - ${{ if eq(parameters.name, 'MacOSX') }}:
+    - script: chmod -R 777 _testoutput
+      displayName: Fix artifact permissions
+
+  - task: PublishTestResults@2
+    condition: always()
+    displayName: Publish Test Results
+    inputs:
+      testResultsFiles: _testoutput/xunit/*.xml
+
+  - task: PublishCodeCoverageResults@1
+    condition: eq(variables['TEST_KIND'], 'unit')
+    inputs:
+      summaryFileLocation: _testoutput/cov/*.xml
+      codeCoverageTool: cobertura
+      reportDirectory: _testoutput/cov
+
+  - task: PublishPipelineArtifact@0
+    condition: and(always(), eq(variables['TEST_KIND'], 'acceptance'))
+    displayName: Publish Robot Output
+    inputs:
+      targetPath: _testoutput/robot
+      artifactName: ${{ parameters.name }} $(BROWSER) $(PY_VERSION)

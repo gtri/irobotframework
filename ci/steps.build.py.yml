@@ -1,0 +1,15 @@
+steps:
+  - script: python -m scripts.test lint copyright py robot
+    displayName: Lint
+
+  - script: python -m scripts.build sdist
+    displayName: Build Python Source
+
+  - script: python -m scripts.build wheel
+    displayName: Build Python Wheel
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish Build
+    inputs:
+      targetPath: dist
+      artifactName: Py Dist

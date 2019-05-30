@@ -15,3 +15,5 @@ envs/
 lib/
 node_modules/
 Untitled*.ipynb
+.coverage
+.coverage*
