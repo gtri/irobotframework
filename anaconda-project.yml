@@ -97,6 +97,7 @@ env_specs:
   default:
     inherit_from:
       - test
+      - docs
     packages:
       - ipywidgets
   irobotframework-minimal:
