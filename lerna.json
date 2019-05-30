@@ -1,7 +1,7 @@
 {
-  "lerna": "2.11.0",
-  "version": "independent",
+  "lerna": "3.10.8",
   "npmClient": "jlpm",
   "registry": "https://registry.npmjs.org/",
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "version": "independent"
 }

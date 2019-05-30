@@ -13,11 +13,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
 
-from traitlets.config import LoggingConfigurable
-
-from robot.running import TestSuiteBuilder
-
 import importnb
+from robot.running import TestSuiteBuilder
+from traitlets.config import LoggingConfigurable
 
 from . import irobot
 

@@ -1,0 +1,22 @@
+parameters:
+  name: Linux
+
+steps:
+  - ${{ if eq(parameters.name, 'Windows') }}:
+    - script: >
+        conda uninstall --force zeromq pyzmq
+        && pip install pyzmq
+      displayName: zmq hack
+  - ${{ if eq(parameters.name, 'MacOSX') }}:
+    - script: |
+        brew update \
+        && brew tap caskroom/cask \
+        && brew cask install firefox
+      condition: and(eq(variables['TEST_KIND'], 'acceptance'), eq(variables['BROWSER'], 'headlessfirefox'))
+      displayName: Install Firefox
+    - script: |
+        brew update \
+        && brew tap caskroom/cask \
+        && brew cask install google-chrome
+      condition: and(eq(variables['TEST_KIND'], 'acceptance'), eq(variables['BROWSER'], 'headlesschrome'))
+      displayName: Install Chrome

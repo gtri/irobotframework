@@ -2,6 +2,8 @@ __pycache__/
 _notebooks
 _testoutput
 .*_cache/
+.coverage*
+.hypothesis/
 .idea/
 .ipynb_checkpoints/
 .jupyter/
@@ -15,4 +17,3 @@ envs/
 lib/
 node_modules/
 Untitled*.ipynb
-.hypothesis/

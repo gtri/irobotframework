@@ -9,20 +9,20 @@
 """ Interactive implementations of Robot Framework primitives
 """
 import inspect
-from io import BytesIO, StringIO
 import os
+from io import BytesIO, StringIO
 from pathlib import Path
 
 from robot.errors import DataError
 from robot.output import LOGGER
 from robot.parsing import TestCaseFile
-from robot.parsing.model import _TestData, KeywordTable, TestCaseFileSettingTable
+from robot.parsing.model import KeywordTable, TestCaseFileSettingTable, _TestData
 from robot.parsing.populators import FromFilePopulator
+from robot.parsing.robotreader import RobotReader
 from robot.parsing.settings import Fixture
 from robot.parsing.tablepopulators import NullPopulator
-from robot.parsing.robotreader import RobotReader
-from robot.utils import get_error_message
 from robot.tidy import Tidy
+from robot.utils import get_error_message
 
 
 class EventListener(object):

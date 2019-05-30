@@ -4,7 +4,9 @@
 """ Pure python tests of completion behavior
 """
 import jupyter_kernel_test
+
 from irobotframework.completion_finders import TABLE_NAMES
+
 from . import RobotBase
 from .utils import taskify
 

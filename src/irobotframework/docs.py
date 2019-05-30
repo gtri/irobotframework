@@ -4,15 +4,14 @@
 """ Documentation-related features for irobotframework
 """
 import sys
-import IPython
-import ipykernel
-from .util import url_path_join as ujoin
 
+import ipykernel
+import IPython
 import robot
 from robot.libraries import STDLIBS
 
 from ._version import __version__
-
+from .util import url_path_join as ujoin
 
 HAS_NO_DOC = ["Remote"]
 PY_DOCS = "https://docs.python.org/%i.%i" % sys.version_info[:2]

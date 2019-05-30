@@ -1,0 +1,21 @@
+steps:
+  - script: python -m scripts.bootstrap js
+    displayName: Bootstrap JS
+
+  - script: python -m scripts.test lint ipynb js
+    displayName: Lint
+
+  - script: python -m scripts.build lerna
+    displayName: Build JS
+
+  - script: python -m scripts.build npm
+    displayName: Build npm Package
+
+  - script: python -m scripts.build jupyterlab
+    displayName: Build Lab
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish Build
+    inputs:
+      targetPath: dist
+      artifactName: JS Dist
