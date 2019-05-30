@@ -11,7 +11,7 @@ steps:
         updateConda: true
         environmentName: _unit$(PY_VERSION)
         packageSpecs: >
-          importnb>=0.5.2
+          importnb>=0.5.5
           ipykernel>=5.1
           ipython>=7.2
           jinja2
@@ -30,7 +30,7 @@ steps:
         environmentName: _accept$(PY_VERSION)
         packageSpecs: >
           geckodriver
-          importnb>=0.5.2
+          importnb>=0.5.5
           ipykernel>=5.1
           ipython>=7.2
           jupyterlab>=0.35.6,<0.36
@@ -50,7 +50,7 @@ steps:
         environmentName: _accept$(PY_VERSION)
         packageSpecs: >
           geckodriver
-          importnb>=0.5.2
+          importnb>=0.5.5
           ipykernel>=5.1
           ipython>=7.2
           jupyterlab>=0.35.6,<0.36
@@ -67,7 +67,7 @@ steps:
         updateConda: false
         environmentName: _unit$(PY_VERSION)
         packageSpecs: >
-          importnb>=0.5.2
+          importnb>=0.5.5
           ipykernel>=5.1
           ipython>=7.2
           jinja2
@@ -87,7 +87,7 @@ steps:
         environmentName: _accept$(PY_VERSION)
         packageSpecs: >
           geckodriver
-          importnb>=0.5.2
+          importnb>=0.5.5
           ipykernel>=5.1
           ipython>=7.2
           jupyterlab>=0.35.6,<0.36
@@ -104,7 +104,7 @@ steps:
         updateConda: false
         environmentName: _unit$(PY_VERSION)
         packageSpecs: >
-          importnb>=0.5.2
+          importnb>=0.5.5
           ipykernel>=5.1
           ipython>=7.2
           jinja2

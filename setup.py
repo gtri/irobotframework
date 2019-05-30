@@ -36,7 +36,7 @@ setup_args = dict(
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
     install_requires=[
-        "importnb>=0.5.2",
+        "importnb>=0.5.5",
         "ipykernel>=5.1",
         "IPython>=7.2",
         "jinja2",

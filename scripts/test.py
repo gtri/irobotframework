@@ -97,7 +97,6 @@ def acceptance(robot_args):
     import chromedriver_binary  # noqa
 
     global BROWSER
-    env = dict(**os.environ)
 
     with TemporaryDirectory() as td:
         tdp = Path(td)

@@ -107,7 +107,7 @@ env_specs:
       - conda-forge
       - defaults
     packages:
-      - importnb >=0.5.2
+      - importnb >=0.5.5
       - ipykernel >=5.1
       - ipython >=7.2
       - jupyterlab >=0.35.6,<0.36
@@ -115,7 +115,7 @@ env_specs:
       - pillow
       - robotframework >=3.1
       - tornado <6
-  default-win:
+  minimal-win:
     inherit_from:
       - irobotframework-minimal
     packages:
@@ -158,7 +158,7 @@ env_specs:
       - sphinx_rtd_theme
       - sphinx-autobuild
       - pip:
-        - robotframeworklexer
+          - robotframeworklexer
   _python:
     packages:
       - python >=3.6,<3.7
