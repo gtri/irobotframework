@@ -36,7 +36,7 @@ steps:
           jupyterlab>=0.35.6,<0.36
           pillow
           python$(PY_SPEC)
-          python-chromedriver-binary>=73,<74
+          python-chromedriver-binary>=2.46,<73
           robotframework-seleniumlibrary>=3.2.0
           robotframework>=3.1.2
 
