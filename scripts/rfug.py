@@ -36,11 +36,14 @@ def build_hashes():
 
 
 def write_fixtures(hashes):
+    fixture_path = FIXTURES / "highlighting" / "samples" / "rfug"
+    for sha, txt in sorted(hashes.items()):
+        out_file = fixture_path / f"{sha}.robot"
+        out_file.write_text(txt)
+
     robot_lines = []
 
-    for sha, txt in sorted(hashes.items()):
-        out_file = FIXTURES / "highlighting" / "samples" / "rfug" / f"{sha}.robot"
-        out_file.write_text(txt)
+    for out_file in sorted(fixture_path.glob("*.robot")):
         robot_lines += [
             str(out_file.relative_to(out_file.parent.parent))
             .replace(".robot", "")
