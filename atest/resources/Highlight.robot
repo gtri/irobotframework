@@ -18,7 +18,7 @@ Robot Syntax Highlighting Should Yield Tokens
     Run Keyword And Ignore Error    Click Element    ${SAVE}
     ${observed} =    Get Cell Source Tokens
     ${cake} =    Evaluate    "\\n".join([" ".join(obs) for obs in ${observed}])
-    Create File    ${OUTPUT DIR}${/}${BROWSER}${/}tokens${/}${example}.tokens    ${cake}
+    Create File    ${OUTPUT DIR}${/}tokens${/}${example}.tokens    ${cake}
     ${raw} =    Get File    ..${/}fixtures${/}highlighting${/}tokens${/}${example}.tokens
     ${expected} =    Evaluate    [line.strip().split(" ") for line in """${raw}""".strip().split("\\n")]
     Should Be Equal    ${observed}    ${expected}
@@ -26,5 +26,5 @@ Robot Syntax Highlighting Should Yield Tokens
 Make a Highlighting Notebook
     [Documentation]    Make a notebook for testing syntax highlighting
     Open JupyterLab with    ${BROWSER}
-    Set Screenshot Directory    ${OUTPUT_DIR}${/}${BROWSER}${/}robot${/}highlighting
+    Set Screenshot Directory    ${OUTPUT_DIR}${/}robot${/}highlighting
     Launch a new    Robot Framework    Notebook

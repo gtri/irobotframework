@@ -68,7 +68,7 @@ Get Cell Source Tokens
       ${raw_classes} =   Call Method    ${el}   get_attribute   class
       ${observed} =  Set Variable  ${raw_classes.replace("cm-", "").split(" ")}
       ${sorted} =  Evaluate  sorted(${observed})
-      Append To List    ${tokens}  ${sorted}
+      Run Keyword If  "tab-wrap-hack" not in ${sorted}   Append To List    ${tokens}  ${sorted}
     END
     [Return]  ${tokens}
 
