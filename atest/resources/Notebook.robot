@@ -8,7 +8,8 @@ Resource          CodeMirror.robot
 *** Variables ***
 ${VISIBLE_NOTEBOOK}  .jp-NotebookPanel:not(.p-mod-hidden)
 ${BUSY_KERNEL}    css:${VISIBLE_NOTEBOOK} .jp-Toolbar-kernelStatus.jp-FilledCircleIcon
-${BUSY_PROMPT}    In [*]:
+${BUSY_PROMPT}    [*]:
+${PROMPT}         css:.jp-InputPrompt
 
 
 *** Keywords ***
@@ -35,4 +36,4 @@ Run Cell
 Wait Until Kernel Is Idle
     [Documentation]    Wait for the kernel to be busy, and then stop being busy
     Wait Until Page Does Not Contain Element    ${BUSY_KERNEL}
-    Wait Until Page Does Not Contain    ${BUSY_PROMPT}
+    Wait Until Element Does Not Contain    ${PROMPT}  ${BUSY_PROMPT}

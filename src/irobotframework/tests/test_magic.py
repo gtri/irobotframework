@@ -4,7 +4,6 @@ from unittest.mock import patch
 
 import jupyter_kernel_test
 import pytest
-
 from irobotframework.magic.robot import cell_magic_tidy
 
 from . import IPythonMagicBase, RobotBase

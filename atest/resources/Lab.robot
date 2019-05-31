@@ -33,10 +33,12 @@ Start JupyterLab
     Set Suite Variable   ${BASE_URL}        http://localhost:18888     children=${True}
     Set Suite Variable   ${LAB_URL}        ${BASE_URL}/lab?token=${TOKEN}     children=${True}
     Set Suite Variable   ${TREE_URL}       ${BASE_URL}/tree?token=${TOKEN}     children=${True}
+    Set Suite Variable   ${SHUTDOWN_URL}       ${BASE_URL}/api/shutdown?token=${TOKEN}     children=${True}
     ${log} =  Set Variable  ${OUTPUT_DIR}${/}_lab.log
     ${cmd} =  Set Variable  ${LAB_CMD} --notebook-dir=${notebooks}
     Create Directory      ${notebooks}
-    Start Process    ${cmd}    shell=true    stderr=STDOUT    stdout=${log}
+    ${proc} =   Start Process    ${cmd}    shell=true    stderr=STDOUT    stdout=${log}
+    Set Suite Variable    ${LAB_PROC}   ${proc}  children=True
     Wait Until Keyword Succeeds   10x   1s   Lab Was Started  ${log}
 
 Lab Was Started
@@ -76,10 +78,9 @@ Reset Application State and Close
 
 Clean Up JupyterLab
     [Documentation]    Close all the browsers and stop all processes
-    Open JupyterLab with  ${BROWSER}
-    Go to  ${TREE_URL}
-    Click Element  css:#shutdown
     Close All Browsers
+    Run Keyword and Ignore Error   Execute   __import__("urllib.request").request.urlopen("${SHUTDOWN_URL}", data=[])
+    Run Keyword and Ignore Error   Wait For Process    ${LAB_PROC}   timeout=10s
     Terminate All Processes    kill=True
 
 Maybe Accept a JupyterLab Prompt

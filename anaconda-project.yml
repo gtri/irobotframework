@@ -3,8 +3,8 @@ name: irobotframework-dev
 variables:
   NEXT_RELEASE: 0.5.0
   EXTENSIONS: >
-    @jupyter-widgets/jupyterlab-manager
-    ./dist/npm/jupyterlab-robotframework-0.5.0.tgz
+    @jupyter-widgets/jupyterlab-manager@0.38.1
+    src/packages/jupyterlab-robotframework
 
 commands:
   bootstrap:
@@ -68,8 +68,8 @@ commands:
     windows: jupyter lab --no-browser --debug --app-dir dist\lab
     env_spec: default
   lab:ext:
-    description: install 3rd party extensions
-    unix: jupyter labextension install $EXTENSIONS --no-build
+    description: install 1st/3rd party extensions
+    unix: jupyter labextension install $EXTENSIONS
     env_spec: default
   ipython:
     description: run IRobotFramework in the terminal

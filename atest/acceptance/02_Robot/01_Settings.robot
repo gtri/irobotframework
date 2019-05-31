@@ -29,17 +29,13 @@ Robot Notebook completes Settings
     Add a Cell    *** Set
     Go to End of Cell Source
     Trigger Cell Source Completion
-    Sleep    0.1s
-    Cell Source Should Equal    *** Settings ***\n
+    Cell Source Should Eventually Contain    *** Settings ***\n
     Append to Cell Source    Lib
     Trigger Cell Source Completion
-    Sleep    0.1s
-    Cell Source Should Contain    Library\ \
+    Cell Source Should Eventually Contain    Library\ \
     Append to Cell Source    Operating
     Trigger Cell Source Completion
-    Sleep    0.1s
-    Cell Source Should Contain    OperatingSystem
+    Cell Source Should Eventually Contain    OperatingSystem
     Append to Cell Source    \nT
     Trigger Cell Source Completion
-    Sleep    0.1s
     Completions Should Contain    Test Setup \ \    Test Teardown \ \    Test Template \ \    Test Timeout \ \    # important whitespace

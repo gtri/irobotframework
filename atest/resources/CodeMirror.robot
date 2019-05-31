@@ -51,6 +51,11 @@ Cell Source Should Contain
     ${result} =  Get Cell Source
     Should Contain    ${result}  ${text}
 
+Cell Source Should Eventually Contain
+    [Documentation]   Whether source of a cell contains given text (eventually)
+    [Arguments]  ${text}
+    Wait Until Keyword Succeeds   5x  1s  Cell Source Should Contain  ${text}
+
 Cell Source Tokens Should Equal
     [Documentation]   Whether a cell is highlighted as expected
     [Arguments]  ${expected_tokens}
@@ -75,6 +80,7 @@ Get Cell Source Tokens
 Trigger Cell Source Completion
     [Documentation]   Initiate Tab Complete
     Press Key  css:body  \\9
+    Wait Until Kernel Is Idle
 
 Completions Should Contain
     [Documentation]   Does the completer show the expected completions?
