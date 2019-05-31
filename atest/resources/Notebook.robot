@@ -8,7 +8,8 @@ Resource          CodeMirror.robot
 *** Variables ***
 ${VISIBLE_NOTEBOOK}  .jp-NotebookPanel:not(.p-mod-hidden)
 ${BUSY_KERNEL}    css:${VISIBLE_NOTEBOOK} .jp-Toolbar-kernelStatus.jp-FilledCircleIcon
-${BUSY_PROMPT}    In [*]:
+${BUSY_PROMPT}    [*]:
+${PROMPT}         css:.jp-InputPrompt
 
 
 *** Keywords ***
@@ -16,7 +17,7 @@ Add a Cell
     [Documentation]   Add a cell (probably code) with the given source
     [Arguments]    ${code}
     Click Element    css:${VISIBLE_NOTEBOOK} .jp-NotebookPanel-toolbar .jp-AddIcon
-    Sleep    0.1s
+    Wait Until Page Contains Element  css:${VISIBLE_NOTEBOOK} ${CELL_CSS}
     Click Element    css:${VISIBLE_NOTEBOOK} ${CELL_CSS}
     Set Cell Source    ${code}
 
@@ -35,4 +36,4 @@ Run Cell
 Wait Until Kernel Is Idle
     [Documentation]    Wait for the kernel to be busy, and then stop being busy
     Wait Until Page Does Not Contain Element    ${BUSY_KERNEL}
-    Wait Until Page Does Not Contain    ${BUSY_PROMPT}
+    Wait Until Element Does Not Contain    ${PROMPT}  ${BUSY_PROMPT}

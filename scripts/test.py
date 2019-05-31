@@ -92,10 +92,15 @@ def unit(pytest_args):
 
 
 def acceptance(robot_args):
-    import chromedriver_binary  # noqa
+    import robot
+
+    try:
+        import chromedriver_binary
+    except ImportError:
+        print("couldn't import chromedriver")
+        chromedriver_binary = None
 
     global BROWSER
-    env = dict(**os.environ)
 
     with TemporaryDirectory() as td:
         tdp = Path(td)
@@ -109,8 +114,10 @@ def acceptance(robot_args):
             robot_args.remove(BROWSER)
             os.environ["BROWSER"] = BROWSER
 
-        env.update(
-            PATH=os.pathsep.join(
+        os.environ.update(
+            PATH=os.environ["path"]
+            if chromedriver_binary is None
+            else os.pathsep.join(
                 [os.path.dirname(chromedriver_binary.__file__), os.environ["PATH"]]
             ),
             JUPYTERLAB_DIR=str(tdp / "lab"),
@@ -125,9 +132,6 @@ def acceptance(robot_args):
 
         args = (
             [
-                sys.executable,
-                "-m",
-                "robot",
                 "--name",
                 f"{BROWSER} on {PLATFORM} on {PY}",
                 "--outputdir",
@@ -154,7 +158,14 @@ def acceptance(robot_args):
             + list(robot_args)
             + [str(TEST_DIR)]
         )
-        return run(args, env=env)
+
+        old_cwd = os.getcwd()
+
+        try:
+            os.chdir(TEST_DIR)
+            robot.run_cli(args)
+        finally:
+            os.chdir(old_cwd)
 
 
 def combine(rebot_args):

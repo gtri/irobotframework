@@ -11,13 +11,13 @@ PIP = DIST / "pip"
 PIP_ARGS = "pip install --ignore-installed --no-deps --no-cache-dir"
 
 COMMANDS = dict(
+    dev=f"{PIP_ARGS} -e .",
+    kernel=f"jupyter kernelspec install --name robotframework --sys-prefix {RES}",
     js="jlpm bootstrap",
     lint="python -m scripts.test lint",
     build="python -m scripts.build",
     sdist=lambda: f"{PIP_ARGS} {sdist()}",
     wheel=lambda: f"{PIP_ARGS} {wheel()}",
-    dev=f"{PIP_ARGS} -e .",
-    kernel=f"jupyter kernelspec install --name robotframework --sys-prefix {RES}",
     test="python -m scripts.test",
 )
 

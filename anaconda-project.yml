@@ -2,14 +2,51 @@ name: irobotframework-dev
 
 variables:
   NEXT_RELEASE: 0.5.0
+  EXTENSIONS: >
+    @jupyter-widgets/jupyterlab-manager@0.38.1
+    src/packages/jupyterlab-robotframework
 
 commands:
-  atom:
-    unix: atom .
-    env_spec: test
   bootstrap:
     unix: python -m scripts.bootstrap
     windows: python -m scripts.bootstrap
+    env_spec: default
+  build:docs:
+    description: build the docs
+    unix: sphinx-build docs dist/docs
+    env_spec: docs
+  build:docs:watch:
+    description: build the docs
+    unix: sphinx-autobuild -b html docs dist/docs
+    env_spec: docs
+  build:pip:sdist:
+    description: build a pip sdist
+    unix: |-
+      set -eux \
+      && python setup.py clean \
+      && python setup.py sdist --dist-dir ${PROJECT_DIR}/dist/pip
+    env_spec: test
+  build:pip:wheel:
+    description: build a pip wheel
+    unix: |-
+      set -eux \
+      && python setup.py clean \
+      && python setup.py bdist_wheel --dist-dir ${PROJECT_DIR}/dist/pip
+    env_spec: test
+  build:npm:
+    description: build an npm package
+    unix: |-
+      set -eux \
+      && mkdir -p dist/npm \
+      && cd src/packages/jupyterlab-robotframework \
+      && mv $(npm pack) ../../../dist/npm/
+    env_spec: test
+  build:rfug:
+    unix: python -m scripts.rfug
+    env_spec: docs
+  jlpm:
+    description: run the yarn bundled with JupyterLab
+    unix: jlpm
     env_spec: default
   build:
     unix: python -m scripts.build
@@ -29,6 +66,10 @@ commands:
     description: run JupyterLab in the built dist folder
     unix: jupyter lab --no-browser --debug --app-dir dist/lab
     windows: jupyter lab --no-browser --debug --app-dir dist\lab
+    env_spec: default
+  lab:ext:
+    description: install 1st/3rd party extensions
+    unix: jupyter labextension install $EXTENSIONS
     env_spec: default
   ipython:
     description: run IRobotFramework in the terminal
@@ -54,17 +95,13 @@ commands:
     env_spec: test
 
 env_specs:
-  _python:
-    packages:
-      - python >=3.6,<3.7
-  _build:
-    description: an environment for building conda packages (busted in CI, use base)
-    inherit_from:
-      - _python
-    packages:
-      - conda-build
-      - conda-verify
   default:
+    inherit_from:
+      - test
+      - docs
+    packages:
+      - ipywidgets
+  irobotframework-minimal:
     description: a pretty heavy environment, because robot & jupyter & node
     inherit_from:
       - _python
@@ -72,31 +109,28 @@ env_specs:
       - conda-forge
       - defaults
     packages:
-      - importnb >=0.5.2
+      - importnb >=0.5.5
       - ipykernel >=5.1
       - ipython >=7.2
-      - jupyterlab >=0.35.4,<0.36
-      - jinja2
+      - jupyterlab >=0.35.6,<0.36
       - nodejs >=8.12,<9
       - pillow
       - robotframework >=3.1
-<<<<<<< HEAD
       - tornado <6
-=======
-  default-win:
+  minimal-win:
     inherit_from:
-      - default
+      - irobotframework-minimal
     packages:
       - nodejs>=8,<9
->>>>>>> bollwyvl/master
   test:
     description: an even-heavier test environment, because browsers
     inherit_from:
-      - default
+      - irobotframework-minimal
     packages:
       - black
       - flake8
       - geckodriver
+      - hypothesis
       - isort
       - jupyter_kernel_test
       - pylint
@@ -108,19 +142,32 @@ env_specs:
       - twine
   test-win:
     inherit_from:
-      - default-win
+      - minimal-win
       - test
   test-win37:
     inherit_from:
-      - default-win
+      - minimal-win
       - test
     packages:
       - python>=3.7,<3.8
   docs:
     inherit_from:
-      - default
+      - irobotframework-minimal
     packages:
       - nbsphinx
+      - lxml
       - sphinx
       - sphinx_rtd_theme
       - sphinx-autobuild
+      - pip:
+          - robotframeworklexer
+  _python:
+    packages:
+      - python >=3.6,<3.7
+  _build:
+    description: an environment for building conda packages (busted in CI, use base)
+    inherit_from:
+      - _python
+    packages:
+      - conda-build
+      - conda-verify

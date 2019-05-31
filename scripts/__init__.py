@@ -1,12 +1,11 @@
 # Copyright (c) 2018 Georgia Tech Research Corporation
 # Distributed under the terms of the BSD-3-Clause License
 
-from pathlib import Path
+import json
 import platform
 import subprocess
 import sys
-import json
-
+from pathlib import Path
 
 PLATFORM = platform.system().lower()
 PY = "{}{}".format(*list(sys.version_info)[:2])
@@ -19,6 +18,10 @@ DIST = ROOT / "dist"
 SRC = ROOT / "src"
 SCRIPTS = ROOT / "scripts"
 DOCS = ROOT / "docs"
+TOOLS = ROOT / "atest" / "tools"
+DIST = ROOT / "dist"
+VENDOR = ROOT / "vendor"
+FIXTURES = ROOT / "atest" / "fixtures"
 
 COPYRIGHT_RE = r"Copyright \(c\) (\d{4}(\s-\s\d{4})?) Georgia Tech Research Corporation"
 

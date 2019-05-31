@@ -1,4 +1,4 @@
-name: default
+name: irobotframework-minimal
 
 channels:
   - conda-forge
@@ -6,10 +6,10 @@ channels:
 
 dependencies:
   - python >=3.6,<3.7
-  - importnb >=0.5.2
+  - importnb >=0.5.5
   - ipykernel >=5.1
   - ipython >=7.2
-  - jupyterlab >=0.35.4,<0.36
+  - jupyterlab >=0.35.6,<0.36
   - nodejs >=8.12,<9
   - pillow
   - robotframework >=3.1
