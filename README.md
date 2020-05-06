@@ -3,7 +3,7 @@
 > _Interactive Acceptance Test-Driven Development and Robot Process Automation,
 > powered by [IPython](http://ipython.org) and [Robot Framework](https://robotframework.org)_
 
-irobotframework is a Jupyter Kernel that provides provides Robot Framework:
+irobotframework is a Jupyter Kernel that provides Robot Framework:
 
 - test **execution** with **rich output** from Robot notebooks
   - ...and IPython with `%%robot`
