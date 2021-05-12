@@ -6,7 +6,7 @@
   "description": "Write and run Robot Framework tests in JupyterLab",
   "devDependencies": {
     "@jupyterlab/application": "^0.19.1",
-    "codemirror": "~5.39.0",
+    "codemirror": "~5.58.2",
     "rimraf": "~2.6.2",
     "typescript": "~3.1.1"
   },
@@ -27,7 +27,7 @@
   "name": "jupyterlab-robotframework",
   "peerDependencies": {
     "@jupyterlab/application": "^0.19.1",
-    "codemirror": "~5.39.0"
+    "codemirror": "~5.58.2"
   },
   "repository": {
     "type": "git",
